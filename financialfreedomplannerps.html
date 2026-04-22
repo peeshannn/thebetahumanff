@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Retirement Drawdown Planner</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #070e1c;
+      color: #e2e8f0;
+      font-family: 'Palatino Linotype', Palatino, Georgia, serif;
+      min-height: 100vh;
+    }
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      border-radius: 2px;
+      background: #1e3a5f;
+      cursor: pointer;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #3b82f6;
+      cursor: pointer;
+      box-shadow: 0 0 8px #3b82f688;
+      transition: transform 0.15s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    .field {
+      background: #0a1628;
+      border: 1px solid #1e3a5f;
+      border-radius: 5px;
+      color: #e2e8f0;
+      font-family: monospace;
+      padding: 5px 8px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+    .field:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px #3b82f622; }
+    .phase-name-field {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid currentColor;
+      border-radius: 0;
+      padding: 2px 0;
+    }
+    .phase-name-field:focus { box-shadow: none; border-color: currentColor; }
+    button { cursor: pointer; transition: all 0.15s; font-family: monospace; }
+    button:hover { opacity: 0.8; transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0a1424; }
+    ::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 3px; }
+    .section-tag {
+      font-size: 9px; letter-spacing: 0.2em; color: #1e3a5f;
+      font-family: monospace; margin-bottom: 8px; text-transform: uppercase;
+    }
+    .card { border-radius: 12px; padding: 22px 24px; }
+    .kpi-val { font-family: monospace; font-weight: 700; letter-spacing: -0.02em; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .fade-in { animation: fadeIn 0.35s ease forwards; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+  const { useState, useMemo, useCallback, useEffect, useRef } = React;
+  const {
+    AreaChart, Area, BarChart, Bar, Cell,
+    XAxis, YAxis, CartesianGrid, Tooltip,
+    ResponsiveContainer, ReferenceLine
+  } = Recharts;
+
+  // ── DEFAULTS ─────────────────────────────────────────────────────────────────
+  const PHASE_COLORS = ["#38bdf8","#fbbf24","#34d399","#a78bfa","#fb923c","#f87171","#e879f9","#22d3ee","#4ade80","#f472b6"];
+
+  const DEFAULT_PHASES = [
+    { id:1, name:"Early Family",    startYr:2029, endYr:2038, real:300000, color:"#38bdf8", ages:"43–52", note:"Family trips · school years" },
+    { id:2, name:"Education Spike", startYr:2039, endYr:2046, real:320000, color:"#fbbf24", ages:"53–60", note:"University · peak family spend" },
+    { id:3, name:"Late Family",     startYr:2047, endYr:2048, real:260000, color:"#34d399", ages:"61–62", note:"Son independent" },
+    { id:4, name:"Freedom Couple",  startYr:2049, endYr:2058, real:200000, color:"#a78bfa", ages:"63–72", note:"Travel · couple lifestyle" },
+    { id:5, name:"Early Health",    startYr:2059, endYr:2068, real:240000, color:"#fb923c", ages:"73–82", note:"Medical costs rising" },
+    { id:6, name:"Late Health",     startYr:2069, endYr:2085, real:300000, color:"#f87171", ages:"83–99", note:"Nursing · care facility" },
+  ];
+
+  // ── CORE MATH ─────────────────────────────────────────────────────────────────
+  function getPhase(yr, phases) {
+    return phases.find(p => yr >= p.startYr && yr <= p.endYr);
+  }
+
+  function simulate(startCap, phases, gr, inf, startYr, endYr) {
+    const rows = [];
+    let bal = startCap;
+    for (let yr = startYr; yr <= endYr; yr++) {
+      const ph   = getPhase(yr, phases);
+      const draw = ph ? ph.real * Math.pow(1 + inf, yr - 2026) : 0;
+      bal = bal * (1 + gr) - draw;
+      rows.push({
+        year:       yr,
+        balance:    Math.max(0, Math.round(bal)),
+        withdrawal: Math.round(draw),
+        phase:      ph?.name ?? "",
+        phColor:    ph?.color ?? "#1e293b",
+        depleted:   bal <= 0,
+      });
+      if (bal <= 0) break;
+    }
+    return rows;
+  }
+
+  function findIdeal(phases, gr, inf, startYr, endYr, target) {
+    if (!phases.length) return 0;
+    let lo = 1_000, hi = 100_000_000;
+    for (let i = 0; i < 90; i++) {
+      const mid  = (lo + hi) / 2;
+      const rows = simulate(mid, phases, gr, inf, startYr, endYr);
+      const ok   = rows.length === endYr - startYr + 1;
+      const last = ok ? rows[rows.length - 1].balance : -1;
+      if (last < target) lo = mid; else hi = mid;
+    }
+    return Math.ceil((lo + hi) / 2 / 10_000) * 10_000;
+  }
+
+  // ── FORMATTERS ────────────────────────────────────────────────────────────────
+  function fmt(n, dp = 2) {
+    if (!isFinite(n) || n === null) return "—";
+    const abs = Math.abs(n);
+    if (abs >= 1_000_000) return `$${(n / 1_000_000).toFixed(dp)}M`;
+    if (abs >= 1_000)     return `$${Math.round(n).toLocaleString()}`;
+    return `$${Math.round(n)}`;
+  }
+
+  // ── TOOLTIP ───────────────────────────────────────────────────────────────────
+  function ChartTip({ active, payload, label }) {
+    if (!active || !payload?.length) return null;
+    return (
+      <div style={{ background:"#0c1a2e", border:"1px solid #1e3a5f", borderRadius:8, padding:"10px 14px", fontSize:12, minWidth:180 }}>
+        <div style={{ color:"#64748b", fontFamily:"monospace", marginBottom:6 }}>{label}</div>
+        {payload.map((p, i) => p.value > 0 && (
+          <div key={i} style={{ display:"flex", justifyContent:"space-between", gap:16, color:p.color||"#e2e8f0", marginBottom:2 }}>
+            <span>{p.name}</span>
+            <span style={{ fontFamily:"monospace", fontWeight:700 }}>{fmt(p.value)}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // ── PHASE CARD ────────────────────────────────────────────────────────────────
+  function PhaseCard({ p, inf, onUpdate, onRemove, canRemove }) {
+    const nomFirst = p.real * Math.pow(1 + inf, p.startYr - 2026);
+    const nomLast  = p.real * Math.pow(1 + inf, p.endYr  - 2026);
+    const yrs      = Math.max(0, p.endYr - p.startYr + 1);
+
+    return (
+      <div className="fade-in" style={{
+        background:"#080f1e", border:`1px solid ${p.color}25`,
+        borderLeft:`3px solid ${p.color}`, borderRadius:11, padding:"16px 16px",
+        display:"flex", flexDirection:"column", gap:10
+      }}>
+        {/* Name row */}
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+          <input
+            className="field phase-name-field"
+            value={p.name}
+            style={{ color:p.color, fontSize:13, fontWeight:700, width:"75%", opacity: 0.9 }}
+            onChange={e => onUpdate("name", e.target.value)}
+          />
+          {canRemove && (
+            <button onClick={onRemove}
+              style={{ background:"transparent", border:"1px solid #1e293b", color:"#475569",
+                borderRadius:4, padding:"2px 8px", fontSize:11 }}>✕
+            </button>
+          )}
+        </div>
+
+        {/* Year range */}
+        <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:8, color:"#334155", fontFamily:"monospace", marginBottom:3, letterSpacing:"0.1em" }}>FROM</div>
+            <input type="number" className="field" value={p.startYr} min={2020} max={2120} step={1}
+              style={{ fontSize:14, fontWeight:600 }}
+              onChange={e => onUpdate("startYr", +e.target.value)} />
+          </div>
+          <div style={{ color:"#1e3a5f", fontSize:16, marginTop:14, flexShrink:0 }}>→</div>
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:8, color:"#334155", fontFamily:"monospace", marginBottom:3, letterSpacing:"0.1em" }}>TO</div>
+            <input type="number" className="field" value={p.endYr} min={2020} max={2120} step={1}
+              style={{ fontSize:14, fontWeight:600 }}
+              onChange={e => onUpdate("endYr", +e.target.value)} />
+          </div>
+          <div style={{ color:"#1e3a5f", fontSize:10, fontFamily:"monospace", marginTop:14, flexShrink:0 }}>
+            {yrs}yr
+          </div>
+        </div>
+
+        {/* Drawdown */}
+        <div>
+          <div style={{ fontSize:8, color:"#334155", fontFamily:"monospace", marginBottom:3, letterSpacing:"0.1em" }}>REAL DRAWDOWN / YR (2026 SGD)</div>
+          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+            <span style={{ color:"#1e3a5f", fontFamily:"monospace", fontSize:16, flexShrink:0 }}>$</span>
+            <input type="number" className="field" value={p.real / 1000} min={0} step={10}
+              style={{ fontSize:20, fontWeight:700, color:p.color }}
+              onChange={e => onUpdate("real", +e.target.value * 1000)} />
+            <span style={{ color:"#334155", fontFamily:"monospace", fontSize:13, flexShrink:0 }}>k</span>
+          </div>
+        </div>
+
+        {/* Nominal range */}
+        <div style={{ fontSize:10, color:"#1e3a5f", fontFamily:"monospace", lineHeight:1.5 }}>
+          {fmt(nomFirst, 1)} → {fmt(nomLast, 1)} nominal
+        </div>
+      </div>
+    );
+  }
+
+  // ── APP ───────────────────────────────────────────────────────────────────────
+  function App() {
+    const [growth, setGrowth]       = useState(6.0);
+    const [inflation, setInflation] = useState(2.7);
+    const [endYear, setEndYear]     = useState(2085);
+    const [startYear]               = useState(2029);
+    const [target, setTarget]       = useState(2_000_000);
+    const [phases, setPhases]       = useState(DEFAULT_PHASES);
+    const [capOverride, setCapOverride] = useState(null);
+
+    const gr  = growth    / 100;
+    const inf = inflation / 100;
+
+    const idealCap = useMemo(() =>
+      findIdeal(phases, gr, inf, startYear, endYear, target),
+      [phases, gr, inf, startYear, endYear, target]
+    );
+
+    // when ideal recomputes, if user hasn't manually set cap, follow ideal
+    const displayCap = capOverride ?? idealCap;
+
+    const sliderMin = Math.max(100_000,  idealCap * 0.4);
+    const sliderMax = Math.max(20_000_000, idealCap * 1.8);
+
+    const data = useMemo(() =>
+      simulate(displayCap, phases, gr, inf, startYear, endYear),
+      [displayCap, phases, gr, inf, startYear, endYear]
+    );
+
+    const complete  = data.length === endYear - startYear + 1;
+    const finalBal  = complete ? data[data.length - 1].balance : 0;
+    const depleted  = !complete;
+    const depYear   = depleted ? (data[data.length - 1]?.year ?? "?") : null;
+    const peakRow   = data.reduce((b, d) => d.balance > b.balance ? d : b, data[0] ?? { balance:0, year:startYear });
+    const totalDrawn = data.reduce((s, d) => s + d.withdrawal, 0);
+    const lastDraw  = data.length ? data[data.length - 1].withdrawal : 0;
+
+    const statusTxt = depleted
+      ? `⚠ Depleted ${depYear}`
+      : finalBal >= target
+      ? `✓ Ends ${fmt(finalBal)}`
+      : `⚠ Ends ${fmt(finalBal)} — below $${(target/1e6).toFixed(1)}M target`;
+    const statusCol = depleted ? "#f87171" : finalBal >= target ? "#34d399" : "#fbbf24";
+
+    const milestones = data.filter(d =>
+      d.year === startYear || d.year === endYear || (d.year - startYear) % 4 === 0
+    );
+
+    const resetCap = () => setCapOverride(null);
+
+    const updatePhase = useCallback((id, field, val) => {
+      setPhases(ps => ps.map(p => p.id === id ? { ...p, [field]: val } : p));
+      setCapOverride(null);
+    }, []);
+
+    const removePhase = useCallback((id) => {
+      setPhases(ps => ps.filter(p => p.id !== id));
+      setCapOverride(null);
+    }, []);
+
+    const addPhase = useCallback(() => {
+      const last = phases[phases.length - 1];
+      const newId = Date.now();
+      const color = PHASE_COLORS[phases.length % PHASE_COLORS.length];
+      setPhases(ps => [...ps, {
+        id: newId,
+        name: `Phase ${ps.length + 1}`,
+        startYr: last ? last.endYr + 1 : startYear,
+        endYr:   last ? last.endYr + 6 : startYear + 5,
+        real:    250_000,
+        color,
+        note: ""
+      }]);
+      setCapOverride(null);
+    }, [phases, startYear]);
+
+    // ── RENDER ──────────────────────────────────────────────────────────────────
+    return (
+      <div style={{ maxWidth:1080, margin:"0 auto", padding:"36px 24px 60px" }}>
+
+        {/* ── HEADER ── */}
+        <div style={{ marginBottom:32 }}>
+          <div style={{ fontSize:9, letterSpacing:"0.25em", color:"#1e3a5f", fontFamily:"monospace", marginBottom:6 }}>
+            RETIREMENT DRAWDOWN PLANNER · SGD
+          </div>
+          <h1 style={{ fontSize:34, fontWeight:700, color:"#f8fafc", letterSpacing:"-0.02em", marginBottom:4 }}>
+            Phased Drawdown Model
+          </h1>
+          <p style={{ color:"#334155", fontSize:13, fontStyle:"italic" }}>
+            All real values in 2026 SGD · 6% growth · 2.7% inflation · target $2M at end · not financial advice
+          </p>
+        </div>
+
+        {/* ─────────────────────────────────────────────────────────────────────── */}
+        {/* § 1 — SLIDER */}
+        {/* ─────────────────────────────────────────────────────────────────────── */}
+        <div className="card" style={{ background:"#0c1a2e", border:"1px solid #1e293b", marginBottom:18 }}>
+          <div className="section-tag">§ 1 — Starting Capital</div>
+          <div style={{ display:"flex", alignItems:"center", gap:20, flexWrap:"wrap" }}>
+            <div style={{ flex:1, minWidth:220 }}>
+              <input type="range"
+                min={sliderMin} max={sliderMax} step={50_000}
+                value={displayCap}
+                onChange={e => setCapOverride(+e.target.value)}
+                style={{ width:"100%", marginBottom:6 }}
+              />
+              <div style={{ display:"flex", justifyContent:"space-between", fontSize:9, fontFamily:"monospace", color:"#1e3a5f" }}>
+                <span>{fmt(sliderMin, 1)}</span><span>{fmt(sliderMax, 1)}</span>
+              </div>
+            </div>
+            <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-start", gap:4 }}>
+              <div className="kpi-val" style={{ fontSize:34, color: displayCap >= idealCap ? "#34d399" : "#f87171" }}>
+                {fmt(displayCap)}
+              </div>
+              <div style={{ fontSize:12, fontFamily:"monospace", color: statusCol }}>
+                {statusTxt}
+              </div>
+            </div>
+            <button onClick={resetCap} style={{
+              padding:"8px 18px", borderRadius:7, border:"1px solid #1d4ed8",
+              background:"#1e3a5f22", color:"#60a5fa", fontSize:11, letterSpacing:"0.06em"
+            }}>RESET TO IDEAL</button>
+          </div>
+          {capOverride !== null && capOverride < idealCap && (
+            <div style={{ marginTop:12, fontSize:12, color:"#fbbf24", fontFamily:"monospace", paddingTop:10, borderTop:"1px solid #0f2030" }}>
+              {fmt(idealCap - capOverride)} below ideal — portfolio may not reach {endYear}
+            </div>
+          )}
+        </div>
+
+        {/* ─────────────────────────────────────────────────────────────────────── */}
+        {/* § 2 — IDEAL CAPITAL + SETTINGS */}
+        {/* ─────────────────────────────────────────────────────────────────────── */}
+        <div className="card" style={{
+          background:"linear-gradient(135deg, #0c1f40 0%, #081628 100%)",
+          border:"1px solid #1d4ed8", marginBottom:18
+        }}>
+          <div className="section-tag" style={{ color:"#1d4ed8" }}>§ 2 — Ideal Starting Capital + Model Settings</div>
+          <div style={{ display:"flex", gap:28, flexWrap:"wrap", alignItems:"flex-start" }}>
+
+            {/* Ideal number */}
+            <div style={{ minWidth:220 }}>
+              <div style={{ fontSize:9, color:"#3b82f6", letterSpacing:"0.2em", fontFamily:"monospace", marginBottom:10 }}>
+                IDEAL STARTING CAPITAL
+              </div>
+              <div className="kpi-val" style={{ fontSize:52, color:"#fff", lineHeight:1 }}>
+                {fmt(idealCap)}
+              </div>
+              <div style={{ fontSize:12, color:"#334155", marginTop:10, lineHeight:1.6 }}>
+                to sustain all phases<br />and end {endYear} with {fmt(target)}
+              </div>
+              <div style={{ marginTop:14, padding:"10px 12px", background:"#071020", borderRadius:8, fontFamily:"monospace", fontSize:13 }}>
+                <span style={{ color:"#334155" }}>Real net return: </span>
+                <span style={{ color: growth > inflation ? "#34d399" : "#f87171", fontWeight:700 }}>
+                  {(growth - inflation).toFixed(1)}% p.a.
+                </span>
+              </div>
+            </div>
+
+            {/* Settings */}
+            <div style={{ flex:1, minWidth:280 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+                {/* Growth */}
+                <div style={{ background:"#071020", borderRadius:9, padding:"12px 14px" }}>
+                  <div style={{ fontSize:8, color:"#334155", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>GROWTH RATE (% P.A.)</div>
+                  <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                    <input type="number" className="field" value={growth} step={0.1} min={0.1} max={30}
+                      style={{ fontSize:20, fontWeight:700, color:"#34d399" }}
+                      onChange={e => { setGrowth(+e.target.value); setCapOverride(null); }} />
+                    <span style={{ color:"#334155", fontFamily:"monospace" }}>%</span>
+                  </div>
+                </div>
+
+                {/* Inflation */}
+                <div style={{ background:"#071020", borderRadius:9, padding:"12px 14px" }}>
+                  <div style={{ fontSize:8, color:"#334155", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>INFLATION (% P.A.)</div>
+                  <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                    <input type="number" className="field" value={inflation} step={0.1} min={0} max={20}
+                      style={{ fontSize:20, fontWeight:700, color:"#fb923c" }}
+                      onChange={e => { setInflation(+e.target.value); setCapOverride(null); }} />
+                    <span style={{ color:"#334155", fontFamily:"monospace" }}>%</span>
+                  </div>
+                </div>
+
+                {/* End Year */}
+                <div style={{ background:"#071020", borderRadius:9, padding:"12px 14px" }}>
+                  <div style={{ fontSize:8, color:"#334155", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>END YEAR</div>
+                  <input type="number" className="field" value={endYear} step={1} min={2030} max={2150}
+                    style={{ fontSize:20, fontWeight:700, color:"#a78bfa" }}
+                    onChange={e => { setEndYear(Math.round(+e.target.value)); setCapOverride(null); }} />
+                </div>
+
+                {/* Target end balance */}
+                <div style={{ background:"#071020", borderRadius:9, padding:"12px 14px" }}>
+                  <div style={{ fontSize:8, color:"#334155", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>END BALANCE TARGET ($)</div>
+                  <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+                    <span style={{ color:"#334155", fontFamily:"monospace" }}>$</span>
+                    <input type="number" className="field" value={target / 1000} step={100} min={0}
+                      style={{ fontSize:20, fontWeight:700, color:"#38bdf8" }}
+                      onChange={e => { setTarget(+e.target.value * 1000); setCapOverride(null); }} />
+                    <span style={{ color:"#334155", fontFamily:"monospace" }}>k</span>
+                  </div>
+                </div>
+
+                {/* Duration + phase count summary */}
+                <div style={{ gridColumn:"span 2", background:"#071020", borderRadius:9, padding:"10px 14px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                  <div>
+                    <span style={{ fontSize:9, color:"#334155", fontFamily:"monospace", letterSpacing:"0.1em" }}>DURATION </span>
+                    <span style={{ fontFamily:"monospace", color:"#64748b", fontSize:14, fontWeight:700 }}>{endYear - startYear + 1} years</span>
+                    <span style={{ fontSize:9, color:"#1e293b", fontFamily:"monospace", marginLeft:12 }}>PHASES </span>
+                    <span style={{ fontFamily:"monospace", color:"#64748b", fontSize:14, fontWeight:700 }}>{phases.length}</span>
+                  </div>
+                  <div style={{ fontFamily:"monospace", fontSize:11, color:"#334155" }}>
+                    {startYear} → {endYear}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ─────────────────────────────────────────────────────────────────────── */}
+        {/* § 3 — PHASES */}
+        {/* ─────────────────────────────────────────────────────────────────────── */}
+        <div className="card" style={{ background:"#0c1a2e", border:"1px solid #1e293b", marginBottom:18 }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
+            <div className="section-tag" style={{ marginBottom:0 }}>§ 3 — Drawdown Phases</div>
+            <button onClick={addPhase} style={{
+              padding:"6px 14px", borderRadius:6, border:"1px solid #34d399",
+              background:"#34d39915", color:"#34d399", fontSize:11, letterSpacing:"0.06em"
+            }}>+ ADD PHASE</button>
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(270px, 1fr))", gap:12 }}>
+            {phases.map(p => (
+              <PhaseCard
+                key={p.id}
+                p={p}
+                inf={inf}
+                onUpdate={(field, val) => updatePhase(p.id, field, val)}
+                onRemove={() => removePhase(p.id)}
+                canRemove={phases.length > 1}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* ─────────────────────────────────────────────────────────────────────── */}
+        {/* KPI ROW */}
+        {/* ─────────────────────────────────────────────────────────────────────── */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10, marginBottom:18 }}>
+          {[
+            { l:"Ideal Capital",   v:fmt(idealCap),                  s:`Required start (${startYear})`,         c:"#60a5fa" },
+            { l:"Peak Portfolio",  v:fmt(peakRow?.balance ?? 0),     s:`Year ${peakRow?.year ?? startYear}`,    c:"#34d399" },
+            { l:"End Balance",     v:depleted ? "DEPLETED" : fmt(finalBal), s:depleted ? `Ran out ${depYear}` : `Nominal ${endYear}`, c:depleted?"#f87171":finalBal>=target?"#34d399":"#fbbf24" },
+            { l:"Total Withdrawn", v:fmt(totalDrawn),                 s:"Nominal SGD all phases",                c:"#fb923c" },
+          ].map(k => (
+            <div key={k.l} style={{ background:"#0c1a2e", border:"1px solid #1e293b", borderRadius:10, padding:"16px 18px" }}>
+              <div style={{ fontSize:8, color:"#1e3a5f", letterSpacing:"0.12em", fontFamily:"monospace", marginBottom:6, textTransform:"uppercase" }}>{k.l}</div>
+              <div className="kpi-val" style={{ fontSize:22, color:k.c }}>{k.v}</div>
+              <div style={{ fontSize:10, color:"#1e3a5f", marginTop:4 }}>{k.s}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* ─────────────────────────────────────────────────────────────────────── */}
+        {/* BALANCE CHART */}
+        {/* ─────────────────────────────────────────────────────────────────────── */}
+        <div className="card" style={{ background:"#0c1a2e", border:"1px solid #1e293b", marginBottom:18 }}>
+          <div className="section-tag">Portfolio Balance</div>
+          <div style={{ fontSize:17, fontWeight:600, color:"#e2e8f0", marginBottom:20 }}>
+            Trajectory {startYear}–{endYear} · Starting {fmt(displayCap)}
+          </div>
+          <ResponsiveContainer width="100%" height={260}>
+            <AreaChart data={data} margin={{ top:4, right:8, bottom:0, left:0 }}>
+              <defs>
+                <linearGradient id="balGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%"  stopColor="#3b82f6" stopOpacity={0.4} />
+                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.03} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#0a1828" />
+              <XAxis dataKey="year" tick={{ fill:"#1e3a5f", fontSize:10, fontFamily:"monospace" }} />
+              <YAxis tickFormatter={v => fmt(v, 1)} tick={{ fill:"#1e3a5f", fontSize:10, fontFamily:"monospace" }} width={80} />
+              <Tooltip content={<ChartTip />} />
+              <ReferenceLine y={target} stroke="#34d399" strokeDasharray="5 3"
+                label={{ value:`${fmt(target, 1)} target`, fill:"#34d399", fontSize:9, position:"insideTopRight" }} />
+              <Area type="monotone" dataKey="balance" name="Portfolio Balance"
+                stroke="#3b82f6" fill="url(#balGrad)" strokeWidth={2} dot={false} />
+            </AreaChart>
+          </ResponsiveContainer>
+          {/* phase bar */}
+          <div style={{ display:"flex", borderRadius:3, overflow:"hidden", height:6, marginTop:14 }}>
+            {phases.map(p => {
+              const total = endYear - startYear + 1;
+              const ph    = Math.max(0, Math.min(p.endYr, endYear) - Math.max(p.startYr, startYear) + 1);
+              return ph > 0 && (
+                <div key={p.id} title={p.name}
+                  style={{ flex: ph / total, background: p.color, opacity: 0.65 }} />
+              );
+            })}
+          </div>
+          <div style={{ display:"flex", gap:14, marginTop:8, flexWrap:"wrap" }}>
+            {phases.map(p => (
+              <div key={p.id} style={{ display:"flex", alignItems:"center", gap:5, fontSize:10, color:"#334155", fontFamily:"monospace" }}>
+                <div style={{ width:8, height:8, borderRadius:2, background:p.color }} /> {p.name}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ─────────────────────────────────────────────────────────────────────── */}
+        {/* DRAWDOWN CHART */}
+        {/* ─────────────────────────────────────────────────────────────────────── */}
+        <div className="card" style={{ background:"#0c1a2e", border:"1px solid #1e293b", marginBottom:18 }}>
+          <div className="section-tag">Annual Drawdowns (Nominal SGD)</div>
+          <div style={{ fontSize:17, fontWeight:600, color:"#e2e8f0", marginBottom:20 }}>
+            What You Actually Withdraw Each Year
+          </div>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={data} barSize={5} margin={{ top:4, right:8, bottom:0, left:0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#0a1828" />
+              <XAxis dataKey="year" tick={{ fill:"#1e3a5f", fontSize:10, fontFamily:"monospace" }} />
+              <YAxis tickFormatter={v => fmt(v, 1)} tick={{ fill:"#1e3a5f", fontSize:10, fontFamily:"monospace" }} width={80} />
+              <Tooltip content={<ChartTip />} />
+              <Bar dataKey="withdrawal" name="Annual Withdrawal">
+                {data.map((d, i) => <Cell key={i} fill={d.phColor} opacity={0.85} />)}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <div style={{ marginTop:10, fontSize:11, color:"#1e3a5f", fontFamily:"monospace" }}>
+            Inflation at {inflation}%/yr means real value stays flat while nominal grows
+          </div>
+        </div>
+
+        {/* ─────────────────────────────────────────────────────────────────────── */}
+        {/* MILESTONE TABLE */}
+        {/* ─────────────────────────────────────────────────────────────────────── */}
+        <div className="card" style={{ background:"#0c1a2e", border:"1px solid #1e293b", marginBottom:18 }}>
+          <div className="section-tag">Milestone Snapshots</div>
+          <div style={{ fontSize:17, fontWeight:600, color:"#e2e8f0", marginBottom:20 }}>
+            Selected Years · Every 4 Years
+          </div>
+          <div style={{ overflowX:"auto" }}>
+            <table style={{ width:"100%", borderCollapse:"collapse", fontSize:12 }}>
+              <thead>
+                <tr style={{ borderBottom:"1px solid #0f2030" }}>
+                  {["Year","Phase","Age","Nominal Draw","Real (2026)","Portfolio Balance"].map(h => (
+                    <th key={h} style={{
+                      textAlign: ["Year","Phase","Age"].includes(h) ? "left" : "right",
+                      padding:"8px 12px", color:"#1e3a5f",
+                      fontSize:9, letterSpacing:"0.1em", fontFamily:"monospace", textTransform:"uppercase"
+                    }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {milestones.map(d => {
+                  const ph  = getPhase(d.year, phases);
+                  const age = 43 + (d.year - startYear);
+                  return (
+                    <tr key={d.year} style={{
+                      borderBottom:"1px solid #080f1e",
+                      background: d.year === endYear ? "#0a1f3a33" : "transparent"
+                    }}>
+                      <td style={{ padding:"10px 12px", fontFamily:"monospace", color:"#475569" }}>{d.year}</td>
+                      <td style={{ padding:"10px 12px" }}>
+                        <span style={{ color:d.phColor, fontSize:11, fontWeight:600 }}>{d.phase || "—"}</span>
+                      </td>
+                      <td style={{ padding:"10px 12px", fontFamily:"monospace", color:"#1e3a5f", fontSize:11 }}>
+                        {age}
+                      </td>
+                      <td style={{ textAlign:"right", padding:"10px 12px", fontFamily:"monospace", color:"#94a3b8" }}>
+                        {fmt(d.withdrawal)}
+                      </td>
+                      <td style={{ textAlign:"right", padding:"10px 12px", fontFamily:"monospace", color:"#1e3a5f" }}>
+                        {ph ? `$${(ph.real / 1000).toFixed(0)}k` : "—"}
+                      </td>
+                      <td style={{ textAlign:"right", padding:"10px 12px" }}>
+                        <span className="kpi-val" style={{
+                          fontSize:14,
+                          color: d.balance < 2_000_000 ? "#f87171"
+                               : d.balance < 5_000_000 ? "#fbbf24"
+                               : d.balance > 10_000_000 ? "#34d399"
+                               : "#60a5fa"
+                        }}>
+                          {fmt(d.balance)}
+                        </span>
+                        {d.year === endYear && <span style={{ fontSize:9, color:"#1e3a5f", marginLeft:6 }}>final</span>}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* FOOTER */}
+        <div style={{ fontSize:11, color:"#0f2030", fontFamily:"monospace", lineHeight:1.9, textAlign:"center", paddingTop:8 }}>
+          RETIREMENT DRAWDOWN PLANNER · APRIL 2026 · FOR ILLUSTRATIVE PURPOSES ONLY · NOT FINANCIAL ADVICE
+        </div>
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
