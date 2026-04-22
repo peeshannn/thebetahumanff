@@ -23,7 +23,7 @@
       appearance: none;
       height: 4px;
       border-radius: 2px;
-      background: #1e3a5f;
+      background: #3b82f6;
       cursor: pointer;
       outline: none;
     }
@@ -39,7 +39,7 @@
     input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
     .field {
       background: #0a1628;
-      border: 1px solid #1e3a5f;
+      border: 1px solid #3b82f6;
       border-radius: 5px;
       color: #3b82f6;
       font-family: monospace;
@@ -62,9 +62,9 @@
     button:active { transform: translateY(0); }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #0a1424; }
-    ::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
     .section-tag {
-      font-size: 9px; letter-spacing: 0.2em; color: #1e3a5f;
+      font-size: 9px; letter-spacing: 0.2em; color: #3b82f6;
       font-family: monospace; margin-bottom: 8px; text-transform: uppercase;
     }
     .card { border-radius: 12px; padding: 22px 24px; }
@@ -147,7 +147,7 @@
   function ChartTip({ active, payload, label }) {
     if (!active || !payload?.length) return null;
     return (
-      <div style={{ background:"#0c1a2e", border:"1px solid #1e3a5f", borderRadius:8, padding:"10px 14px", fontSize:12, minWidth:180 }}>
+      <div style={{ background:"#0c1a2e", border:"1px solid #3b82f6", borderRadius:8, padding:"10px 14px", fontSize:12, minWidth:180 }}>
         <div style={{ color:"#64748b", fontFamily:"monospace", marginBottom:6 }}>{label}</div>
         {payload.map((p, i) => p.value > 0 && (
           <div key={i} style={{ display:"flex", justifyContent:"space-between", gap:16, color:p.color||"#3b82f6", marginBottom:2 }}>
@@ -195,14 +195,14 @@
               style={{ fontSize:14, fontWeight:600 }}
               onChange={e => onUpdate("startYr", +e.target.value)} />
           </div>
-          <div style={{ color:"#1e3a5f", fontSize:16, marginTop:14, flexShrink:0 }}>→</div>
+          <div style={{ color:"#3b82f6", fontSize:16, marginTop:14, flexShrink:0 }}>→</div>
           <div style={{ flex:1 }}>
             <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", marginBottom:3, letterSpacing:"0.1em" }}>TO</div>
             <input type="number" className="field" value={p.endYr} min={2020} max={2120} step={1}
               style={{ fontSize:14, fontWeight:600 }}
               onChange={e => onUpdate("endYr", +e.target.value)} />
           </div>
-          <div style={{ color:"#1e3a5f", fontSize:10, fontFamily:"monospace", marginTop:14, flexShrink:0 }}>
+          <div style={{ color:"#3b82f6", fontSize:10, fontFamily:"monospace", marginTop:14, flexShrink:0 }}>
             {yrs}yr
           </div>
         </div>
@@ -211,7 +211,7 @@
         <div>
           <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", marginBottom:3, letterSpacing:"0.1em" }}>REAL DRAWDOWN / YR (2026 SGD)</div>
           <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-            <span style={{ color:"#1e3a5f", fontFamily:"monospace", fontSize:16, flexShrink:0 }}>$</span>
+            <span style={{ color:"#3b82f6", fontFamily:"monospace", fontSize:16, flexShrink:0 }}>$</span>
             <input type="number" className="field" value={p.real / 1000} min={0} step={10}
               style={{ fontSize:20, fontWeight:700, color:p.color }}
               onChange={e => onUpdate("real", +e.target.value * 1000)} />
@@ -220,7 +220,7 @@
         </div>
 
         {/* Nominal range */}
-        <div style={{ fontSize:10, color:"#1e3a5f", fontFamily:"monospace", lineHeight:1.5 }}>
+        <div style={{ fontSize:10, color:"#3b82f6", fontFamily:"monospace", lineHeight:1.5 }}>
           {fmt(nomFirst, 1)} → {fmt(nomLast, 1)} nominal
         </div>
       </div>
@@ -309,7 +309,7 @@
 
         {/* ── HEADER ── */}
         <div style={{ marginBottom:32 }}>
-          <div style={{ fontSize:9, letterSpacing:"0.25em", color:"#1e3a5f", fontFamily:"monospace", marginBottom:6 }}>
+          <div style={{ fontSize:9, letterSpacing:"0.25em", color:"#3b82f6", fontFamily:"monospace", marginBottom:6 }}>
             the betahuman · NOT Financial Advice
           </div>
           <h1 style={{ fontSize:34, fontWeight:700, color:"#f8fafc", letterSpacing:"-0.02em", marginBottom:4 }}>
@@ -333,7 +333,7 @@
                 onChange={e => setCapOverride(+e.target.value)}
                 style={{ width:"100%", marginBottom:6 }}
               />
-              <div style={{ display:"flex", justifyContent:"space-between", fontSize:9, fontFamily:"monospace", color:"#1e3a5f" }}>
+              <div style={{ display:"flex", justifyContent:"space-between", fontSize:9, fontFamily:"monospace", color:"#3b82f6" }}>
                 <span>{fmt(sliderMin, 1)}</span><span>{fmt(sliderMax, 1)}</span>
               </div>
             </div>
@@ -347,7 +347,7 @@
             </div>
             <button onClick={resetCap} style={{
               padding:"8px 18px", borderRadius:7, border:"1px solid #3b82f6",
-              background:"#1e3a5f22", color:"#60a5fa", fontSize:11, letterSpacing:"0.06em"
+              background:"#3b82f622", color:"#60a5fa", fontSize:11, letterSpacing:"0.06em"
             }}>RESET TO IDEAL</button>
           </div>
           {capOverride !== null && capOverride < idealCap && (
@@ -484,9 +484,9 @@
             { l:"Total Withdrawn", v:fmt(totalDrawn),                 s:"Nominal SGD all phases",                c:"#fb923c" },
           ].map(k => (
             <div key={k.l} style={{ background:"#0c1a2e", border:"1px solid #1e293b", borderRadius:10, padding:"16px 18px" }}>
-              <div style={{ fontSize:8, color:"#1e3a5f", letterSpacing:"0.12em", fontFamily:"monospace", marginBottom:6, textTransform:"uppercase" }}>{k.l}</div>
+              <div style={{ fontSize:8, color:"#3b82f6", letterSpacing:"0.12em", fontFamily:"monospace", marginBottom:6, textTransform:"uppercase" }}>{k.l}</div>
               <div className="kpi-val" style={{ fontSize:22, color:k.c }}>{k.v}</div>
-              <div style={{ fontSize:10, color:"#1e3a5f", marginTop:4 }}>{k.s}</div>
+              <div style={{ fontSize:10, color:"#3b82f6", marginTop:4 }}>{k.s}</div>
             </div>
           ))}
         </div>
@@ -508,8 +508,8 @@
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#0a1828" />
-              <XAxis dataKey="year" tick={{ fill:"#1e3a5f", fontSize:10, fontFamily:"monospace" }} />
-              <YAxis tickFormatter={v => fmt(v, 1)} tick={{ fill:"#1e3a5f", fontSize:10, fontFamily:"monospace" }} width={80} />
+              <XAxis dataKey="year" tick={{ fill:"#3b82f6", fontSize:10, fontFamily:"monospace" }} />
+              <YAxis tickFormatter={v => fmt(v, 1)} tick={{ fill:"#3b82f6", fontSize:10, fontFamily:"monospace" }} width={80} />
               <Tooltip content={<ChartTip />} />
               <ReferenceLine y={target} stroke="#34d399" strokeDasharray="5 3"
                 label={{ value:`${fmt(target, 1)} target`, fill:"#34d399", fontSize:9, position:"insideTopRight" }} />
@@ -548,15 +548,15 @@
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={data} barSize={5} margin={{ top:4, right:8, bottom:0, left:0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#0a1828" />
-              <XAxis dataKey="year" tick={{ fill:"#1e3a5f", fontSize:10, fontFamily:"monospace" }} />
-              <YAxis tickFormatter={v => fmt(v, 1)} tick={{ fill:"#1e3a5f", fontSize:10, fontFamily:"monospace" }} width={80} />
+              <XAxis dataKey="year" tick={{ fill:"#3b82f6", fontSize:10, fontFamily:"monospace" }} />
+              <YAxis tickFormatter={v => fmt(v, 1)} tick={{ fill:"#3b82f6", fontSize:10, fontFamily:"monospace" }} width={80} />
               <Tooltip content={<ChartTip />} />
               <Bar dataKey="withdrawal" name="Annual Withdrawal">
                 {data.map((d, i) => <Cell key={i} fill={d.phColor} opacity={0.85} />)}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-          <div style={{ marginTop:10, fontSize:11, color:"#1e3a5f", fontFamily:"monospace" }}>
+          <div style={{ marginTop:10, fontSize:11, color:"#3b82f6", fontFamily:"monospace" }}>
             Inflation at {inflation}%/yr means real value stays flat while nominal grows
           </div>
         </div>
@@ -576,7 +576,7 @@
                   {["Year","Phase","Age","Nominal Draw","Real (2026)","Portfolio Balance"].map(h => (
                     <th key={h} style={{
                       textAlign: ["Year","Phase","Age"].includes(h) ? "left" : "right",
-                      padding:"8px 12px", color:"#1e3a5f",
+                      padding:"8px 12px", color:"#3b82f6",
                       fontSize:9, letterSpacing:"0.1em", fontFamily:"monospace", textTransform:"uppercase"
                     }}>{h}</th>
                   ))}
@@ -595,13 +595,13 @@
                       <td style={{ padding:"10px 12px" }}>
                         <span style={{ color:d.phColor, fontSize:11, fontWeight:600 }}>{d.phase || "—"}</span>
                       </td>
-                      <td style={{ padding:"10px 12px", fontFamily:"monospace", color:"#1e3a5f", fontSize:11 }}>
+                      <td style={{ padding:"10px 12px", fontFamily:"monospace", color:"#3b82f6", fontSize:11 }}>
                         {age}
                       </td>
                       <td style={{ textAlign:"right", padding:"10px 12px", fontFamily:"monospace", color:"#94a3b8" }}>
                         {fmt(d.withdrawal)}
                       </td>
-                      <td style={{ textAlign:"right", padding:"10px 12px", fontFamily:"monospace", color:"#1e3a5f" }}>
+                      <td style={{ textAlign:"right", padding:"10px 12px", fontFamily:"monospace", color:"#3b82f6" }}>
                         {ph ? `$${(ph.real / 1000).toFixed(0)}k` : "—"}
                       </td>
                       <td style={{ textAlign:"right", padding:"10px 12px" }}>
@@ -614,7 +614,7 @@
                         }}>
                           {fmt(d.balance)}
                         </span>
-                        {d.year === endYear && <span style={{ fontSize:9, color:"#1e3a5f", marginLeft:6 }}>final</span>}
+                        {d.year === endYear && <span style={{ fontSize:9, color:"#3b82f6", marginLeft:6 }}>final</span>}
                       </td>
                     </tr>
                   );
