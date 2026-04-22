@@ -190,14 +190,14 @@
         {/* Year range */}
         <div style={{ display:"flex", gap:8, alignItems:"center" }}>
           <div style={{ flex:1 }}>
-            <div style={{ fontSize:8, color:"#334155", fontFamily:"monospace", marginBottom:3, letterSpacing:"0.1em" }}>FROM</div>
+            <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", marginBottom:3, letterSpacing:"0.1em" }}>FROM</div>
             <input type="number" className="field" value={p.startYr} min={2020} max={2120} step={1}
               style={{ fontSize:14, fontWeight:600 }}
               onChange={e => onUpdate("startYr", +e.target.value)} />
           </div>
           <div style={{ color:"#1e3a5f", fontSize:16, marginTop:14, flexShrink:0 }}>→</div>
           <div style={{ flex:1 }}>
-            <div style={{ fontSize:8, color:"#334155", fontFamily:"monospace", marginBottom:3, letterSpacing:"0.1em" }}>TO</div>
+            <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", marginBottom:3, letterSpacing:"0.1em" }}>TO</div>
             <input type="number" className="field" value={p.endYr} min={2020} max={2120} step={1}
               style={{ fontSize:14, fontWeight:600 }}
               onChange={e => onUpdate("endYr", +e.target.value)} />
@@ -209,13 +209,13 @@
 
         {/* Drawdown */}
         <div>
-          <div style={{ fontSize:8, color:"#334155", fontFamily:"monospace", marginBottom:3, letterSpacing:"0.1em" }}>REAL DRAWDOWN / YR (2026 SGD)</div>
+          <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", marginBottom:3, letterSpacing:"0.1em" }}>REAL DRAWDOWN / YR (2026 SGD)</div>
           <div style={{ display:"flex", alignItems:"center", gap:6 }}>
             <span style={{ color:"#1e3a5f", fontFamily:"monospace", fontSize:16, flexShrink:0 }}>$</span>
             <input type="number" className="field" value={p.real / 1000} min={0} step={10}
               style={{ fontSize:20, fontWeight:700, color:p.color }}
               onChange={e => onUpdate("real", +e.target.value * 1000)} />
-            <span style={{ color:"#334155", fontFamily:"monospace", fontSize:13, flexShrink:0 }}>k</span>
+            <span style={{ color:"#3b82f6", fontFamily:"monospace", fontSize:13, flexShrink:0 }}>k</span>
           </div>
         </div>
 
@@ -315,7 +315,7 @@
           <h1 style={{ fontSize:34, fontWeight:700, color:"#f8fafc", letterSpacing:"-0.02em", marginBottom:4 }}>
             Financial Freedom Planner
           </h1>
-          <p style={{ color:"#334155", fontSize:13, fontStyle:"italic" }}>
+          <p style={{ color:"#3b82f6", fontSize:13, fontStyle:"italic" }}>
             All values in SGD
           </p>
         </div>
@@ -346,7 +346,7 @@
               </div>
             </div>
             <button onClick={resetCap} style={{
-              padding:"8px 18px", borderRadius:7, border:"1px solid #1d4ed8",
+              padding:"8px 18px", borderRadius:7, border:"1px solid #3b82f6",
               background:"#1e3a5f22", color:"#60a5fa", fontSize:11, letterSpacing:"0.06em"
             }}>RESET TO IDEAL</button>
           </div>
@@ -362,9 +362,9 @@
         {/* ─────────────────────────────────────────────────────────────────────── */}
         <div className="card" style={{
           background:"linear-gradient(135deg, #0c1f40 0%, #081628 100%)",
-          border:"1px solid #1d4ed8", marginBottom:18
+          border:"1px solid #3b82f6", marginBottom:18
         }}>
-          <div className="section-tag" style={{ color:"#1d4ed8" }}>§ 2 — Ideal Starting Capital + Model Settings</div>
+          <div className="section-tag" style={{ color:"#3b82f6" }}>§ 2 — Ideal Starting Capital + Model Settings</div>
           <div style={{ display:"flex", gap:28, flexWrap:"wrap", alignItems:"flex-start" }}>
 
             {/* Ideal number */}
@@ -375,11 +375,11 @@
               <div className="kpi-val" style={{ fontSize:52, color:"#fff", lineHeight:1 }}>
                 {fmt(idealCap)}
               </div>
-              <div style={{ fontSize:12, color:"#334155", marginTop:10, lineHeight:1.6 }}>
+              <div style={{ fontSize:12, color:"#3b82f6", marginTop:10, lineHeight:1.6 }}>
                 to sustain all phases<br />and end {endYear} with {fmt(target)}
               </div>
               <div style={{ marginTop:14, padding:"10px 12px", background:"#071020", borderRadius:8, fontFamily:"monospace", fontSize:13 }}>
-                <span style={{ color:"#334155" }}>Real net return: </span>
+                <span style={{ color:"#3b82f6" }}>Real net return: </span>
                 <span style={{ color: growth > inflation ? "#34d399" : "#f87171", fontWeight:700 }}>
                   {(growth - inflation).toFixed(1)}% p.a.
                 </span>
@@ -391,29 +391,29 @@
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
                 {/* Growth */}
                 <div style={{ background:"#071020", borderRadius:9, padding:"12px 14px" }}>
-                  <div style={{ fontSize:8, color:"#334155", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>GROWTH RATE (% P.A.)</div>
+                  <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>GROWTH RATE (% P.A.)</div>
                   <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                     <input type="number" className="field" value={growth} step={0.1} min={0.1} max={30}
                       style={{ fontSize:20, fontWeight:700, color:"#34d399" }}
                       onChange={e => { setGrowth(+e.target.value); setCapOverride(null); }} />
-                    <span style={{ color:"#334155", fontFamily:"monospace" }}>%</span>
+                    <span style={{ color:"#3b82f6", fontFamily:"monospace" }}>%</span>
                   </div>
                 </div>
 
                 {/* Inflation */}
                 <div style={{ background:"#071020", borderRadius:9, padding:"12px 14px" }}>
-                  <div style={{ fontSize:8, color:"#334155", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>INFLATION (% P.A.)</div>
+                  <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>INFLATION (% P.A.)</div>
                   <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                     <input type="number" className="field" value={inflation} step={0.1} min={0} max={20}
                       style={{ fontSize:20, fontWeight:700, color:"#fb923c" }}
                       onChange={e => { setInflation(+e.target.value); setCapOverride(null); }} />
-                    <span style={{ color:"#334155", fontFamily:"monospace" }}>%</span>
+                    <span style={{ color:"#3b82f6", fontFamily:"monospace" }}>%</span>
                   </div>
                 </div>
 
                 {/* End Year */}
                 <div style={{ background:"#071020", borderRadius:9, padding:"12px 14px" }}>
-                  <div style={{ fontSize:8, color:"#334155", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>END YEAR</div>
+                  <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>END YEAR</div>
                   <input type="number" className="field" value={endYear} step={1} min={2030} max={2150}
                     style={{ fontSize:20, fontWeight:700, color:"#a78bfa" }}
                     onChange={e => { setEndYear(Math.round(+e.target.value)); setCapOverride(null); }} />
@@ -421,25 +421,25 @@
 
                 {/* Target end balance */}
                 <div style={{ background:"#071020", borderRadius:9, padding:"12px 14px" }}>
-                  <div style={{ fontSize:8, color:"#334155", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>END BALANCE TARGET ($)</div>
+                  <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>END BALANCE TARGET ($)</div>
                   <div style={{ display:"flex", alignItems:"center", gap:4 }}>
-                    <span style={{ color:"#334155", fontFamily:"monospace" }}>$</span>
+                    <span style={{ color:"#3b82f6", fontFamily:"monospace" }}>$</span>
                     <input type="number" className="field" value={target / 1000} step={100} min={0}
                       style={{ fontSize:20, fontWeight:700, color:"#38bdf8" }}
                       onChange={e => { setTarget(+e.target.value * 1000); setCapOverride(null); }} />
-                    <span style={{ color:"#334155", fontFamily:"monospace" }}>k</span>
+                    <span style={{ color:"#3b82f6", fontFamily:"monospace" }}>k</span>
                   </div>
                 </div>
 
                 {/* Duration + phase count summary */}
                 <div style={{ gridColumn:"span 2", background:"#071020", borderRadius:9, padding:"10px 14px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                   <div>
-                    <span style={{ fontSize:9, color:"#334155", fontFamily:"monospace", letterSpacing:"0.1em" }}>DURATION </span>
+                    <span style={{ fontSize:9, color:"#3b82f6", fontFamily:"monospace", letterSpacing:"0.1em" }}>DURATION </span>
                     <span style={{ fontFamily:"monospace", color:"#64748b", fontSize:14, fontWeight:700 }}>{endYear - startYear + 1} years</span>
                     <span style={{ fontSize:9, color:"#1e293b", fontFamily:"monospace", marginLeft:12 }}>PHASES </span>
                     <span style={{ fontFamily:"monospace", color:"#64748b", fontSize:14, fontWeight:700 }}>{phases.length}</span>
                   </div>
-                  <div style={{ fontFamily:"monospace", fontSize:11, color:"#334155" }}>
+                  <div style={{ fontFamily:"monospace", fontSize:11, color:"#3b82f6" }}>
                     {startYear} → {endYear}
                   </div>
                 </div>
@@ -530,7 +530,7 @@
           </div>
           <div style={{ display:"flex", gap:14, marginTop:8, flexWrap:"wrap" }}>
             {phases.map(p => (
-              <div key={p.id} style={{ display:"flex", alignItems:"center", gap:5, fontSize:10, color:"#334155", fontFamily:"monospace" }}>
+              <div key={p.id} style={{ display:"flex", alignItems:"center", gap:5, fontSize:10, color:"#3b82f6", fontFamily:"monospace" }}>
                 <div style={{ width:8, height:8, borderRadius:2, background:p.color }} /> {p.name}
               </div>
             ))}
