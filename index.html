@@ -14,7 +14,7 @@
     html { scroll-behavior: smooth; }
     body {
       background: #070e1c;
-      color: #e2e8f0;
+      color: #3b82f6;
       font-family: 'Palatino Linotype', Palatino, Georgia, serif;
       min-height: 100vh;
     }
@@ -41,7 +41,7 @@
       background: #0a1628;
       border: 1px solid #1e3a5f;
       border-radius: 5px;
-      color: #e2e8f0;
+      color: #3b82f6;
       font-family: monospace;
       padding: 5px 8px;
       outline: none;
@@ -150,7 +150,7 @@
       <div style={{ background:"#0c1a2e", border:"1px solid #1e3a5f", borderRadius:8, padding:"10px 14px", fontSize:12, minWidth:180 }}>
         <div style={{ color:"#64748b", fontFamily:"monospace", marginBottom:6 }}>{label}</div>
         {payload.map((p, i) => p.value > 0 && (
-          <div key={i} style={{ display:"flex", justifyContent:"space-between", gap:16, color:p.color||"#e2e8f0", marginBottom:2 }}>
+          <div key={i} style={{ display:"flex", justifyContent:"space-between", gap:16, color:p.color||"#3b82f6", marginBottom:2 }}>
             <span>{p.name}</span>
             <span style={{ fontFamily:"monospace", fontWeight:700 }}>{fmt(p.value)}</span>
           </div>
@@ -496,7 +496,7 @@
         {/* ─────────────────────────────────────────────────────────────────────── */}
         <div className="card" style={{ background:"#0c1a2e", border:"1px solid #1e293b", marginBottom:18 }}>
           <div className="section-tag">Portfolio Balance</div>
-          <div style={{ fontSize:17, fontWeight:600, color:"#e2e8f0", marginBottom:20 }}>
+          <div style={{ fontSize:17, fontWeight:600, color:"#3b82f6", marginBottom:20 }}>
             Trajectory {startYear}–{endYear} · Starting {fmt(displayCap)}
           </div>
           <ResponsiveContainer width="100%" height={260}>
@@ -542,7 +542,7 @@
         {/* ─────────────────────────────────────────────────────────────────────── */}
         <div className="card" style={{ background:"#0c1a2e", border:"1px solid #1e293b", marginBottom:18 }}>
           <div className="section-tag">Annual Drawdowns (Nominal SGD)</div>
-          <div style={{ fontSize:17, fontWeight:600, color:"#e2e8f0", marginBottom:20 }}>
+          <div style={{ fontSize:17, fontWeight:600, color:"#3b82f6", marginBottom:20 }}>
             What You Actually Withdraw Each Year
           </div>
           <ResponsiveContainer width="100%" height={200}>
@@ -566,7 +566,7 @@
         {/* ─────────────────────────────────────────────────────────────────────── */}
         <div className="card" style={{ background:"#0c1a2e", border:"1px solid #1e293b", marginBottom:18 }}>
           <div className="section-tag">Milestone Snapshots</div>
-          <div style={{ fontSize:17, fontWeight:600, color:"#e2e8f0", marginBottom:20 }}>
+          <div style={{ fontSize:17, fontWeight:600, color:"#3b82f6", marginBottom:20 }}>
             Selected Years · Every 4 Years
           </div>
           <div style={{ overflowX:"auto" }}>
