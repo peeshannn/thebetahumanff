@@ -232,7 +232,8 @@
     const [growth, setGrowth]       = useState(6.0);
     const [inflation, setInflation] = useState(2.7);
     const [endYear, setEndYear]     = useState(2085);
-    const [startYear]               = useState(2029);
+    const [startYear, setStartYear] = useState(2029);
+    const [birthYear, setBirthYear] = useState(1986);
     const [target, setTarget]       = useState(2_000_000);
     const [phases, setPhases]       = useState(DEFAULT_PHASES);
     const [capOverride, setCapOverride] = useState(null);
@@ -411,6 +412,27 @@
                   </div>
                 </div>
 
+                {/* Start Year — NEW */}
+                <div style={{ background:"#071020", borderRadius:9, padding:"12px 14px" }}>
+                  <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>START YEAR (RETIREMENT)</div>
+                  <input type="number" className="field" value={startYear} step={1} min={2024} max={2080}
+                    style={{ fontSize:20, fontWeight:700, color:"#34d399" }}
+                    onChange={e => { setStartYear(Math.round(+e.target.value)); setCapOverride(null); }} />
+                </div>
+
+                {/* Birth Year — NEW */}
+                <div style={{ background:"#071020", borderRadius:9, padding:"12px 14px" }}>
+                  <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>BIRTH YEAR</div>
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <input type="number" className="field" value={birthYear} step={1} min={1940} max={2010}
+                      style={{ fontSize:20, fontWeight:700, color:"#e879f9" }}
+                      onChange={e => { setBirthYear(Math.round(+e.target.value)); }} />
+                  </div>
+                  <div style={{ fontSize:9, color:"#3b82f6", fontFamily:"monospace", marginTop:5 }}>
+                    Age at retirement: {startYear - birthYear}
+                  </div>
+                </div>
+
                 {/* End Year */}
                 <div style={{ background:"#071020", borderRadius:9, padding:"12px 14px" }}>
                   <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>END YEAR</div>
@@ -585,7 +607,7 @@
               <tbody>
                 {milestones.map(d => {
                   const ph  = getPhase(d.year, phases);
-                  const age = 43 + (d.year - startYear);
+                  const age = d.year - birthYear;
                   return (
                     <tr key={d.year} style={{
                       borderBottom:"1px solid #080f1e",
