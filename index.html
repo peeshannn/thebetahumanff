@@ -14,143 +14,181 @@
     html { scroll-behavior: smooth; }
     body {
       background: #070e1c;
-      color: #3b82f6;
+      color: #c8a96e;
       font-family: 'Palatino Linotype', Palatino, Georgia, serif;
       min-height: 100vh;
     }
     input[type=range] {
-      -webkit-appearance: none;
-      appearance: none;
-      height: 4px;
-      border-radius: 2px;
-      background: #3b82f6;
-      cursor: pointer;
-      outline: none;
+      -webkit-appearance: none; appearance: none;
+      height: 4px; border-radius: 2px; background: #c8a96e44; cursor: pointer; outline: none;
     }
     input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 18px; height: 18px;
-      border-radius: 50%;
-      background: #3b82f6;
-      cursor: pointer;
-      box-shadow: 0 0 8px #3b82f688;
-      transition: transform 0.15s;
+      -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+      background: #c8a96e; cursor: pointer; box-shadow: 0 0 10px #c8a96e66; transition: transform 0.15s;
     }
     input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
     .field {
-      background: #0a1628;
-      border: 1px solid #3b82f6;
-      border-radius: 5px;
-      color: #3b82f6;
-      font-family: monospace;
-      padding: 5px 8px;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      width: 100%;
+      background: #070e1c; border: 1px solid #c8a96e55; border-radius: 5px;
+      color: #f0ead8; font-family: monospace; padding: 5px 8px; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s; width: 100%;
     }
-    .field:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px #3b82f622; }
+    .field:focus { border-color: #c8a96e; box-shadow: 0 0 0 2px #c8a96e22; }
     .phase-name-field {
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid currentColor;
-      border-radius: 0;
-      padding: 2px 0;
+      background: transparent; border: none; border-bottom: 1px solid currentColor;
+      border-radius: 0; padding: 2px 0;
     }
-    .phase-name-field:focus { box-shadow: none; border-color: currentColor; }
+    .phase-name-field:focus { box-shadow: none; }
     button { cursor: pointer; transition: all 0.15s; font-family: monospace; }
-    button:hover { opacity: 0.8; transform: translateY(-1px); }
+    button:hover { opacity: 0.85; transform: translateY(-1px); }
     button:active { transform: translateY(0); }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #0a1424; }
-    ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
+    ::-webkit-scrollbar-track { background: #060d14; }
+    ::-webkit-scrollbar-thumb { background: #c8a96e55; border-radius: 3px; }
     .section-tag {
-      font-size: 9px; letter-spacing: 0.2em; color: #3b82f6;
-      font-family: monospace; margin-bottom: 8px; text-transform: uppercase;
+      font-size: 10px; letter-spacing: 0.2em; color: #c8a96e;
+      font-family: monospace; margin-bottom: 10px; text-transform: uppercase;
     }
     .card { border-radius: 12px; padding: 22px 24px; }
     .kpi-val { font-family: monospace; font-weight: 700; letter-spacing: -0.02em; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
     .fade-in { animation: fadeIn 0.35s ease forwards; }
+    .cpf-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: #94b8d4; font-family: monospace; font-size: 11px;
+      text-decoration: none; padding: 5px 10px;
+      border: 1px solid #94b8d444; border-radius: 5px; background: #94b8d40a;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .cpf-link:hover { background: #94b8d418; border-color: #94b8d488; }
+    .cpf-section {
+      background: #070f18; border: 1px solid #94b8d422;
+      border-left: 3px solid #94b8d4; border-radius: 10px; padding: 16px 18px; margin-top: 14px;
+    }
+    .connector {
+      display: flex; align-items: center; justify-content: center;
+      padding: 18px 0 14px; gap: 14px;
+    }
+    .connector-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #c8a96e44, transparent); }
+    .connector-pill {
+      font-family: monospace; font-size: 10px; color: #c8a96e;
+      letter-spacing: 0.15em; border: 1px solid #c8a96e55;
+      border-radius: 20px; padding: 5px 16px; white-space: nowrap;
+    }
+    .input-cell {
+      background: #0a0f0a; border-radius: 9px; padding: 12px 14px;
+    }
+    .input-label {
+      font-size: 10px; color: #c8a96e; font-family: monospace;
+      letter-spacing: 0.1em; margin-bottom: 6px; text-transform: uppercase;
+    }
+    .input-hint {
+      font-size: 10px; color: #c8a96e; font-family: monospace; margin-top: 5px;
+    }
   </style>
 </head>
 <body>
   <div id="root"></div>
-
   <script type="text/babel">
-  const { useState, useMemo, useCallback, useEffect, useRef } = React;
+  const { useState, useMemo, useCallback } = React;
   const {
-    AreaChart, Area, BarChart, Bar, Cell,
+    AreaChart, Area, BarChart, Bar, Cell, Line,
     XAxis, YAxis, CartesianGrid, Tooltip,
-    ResponsiveContainer, ReferenceLine
+    ResponsiveContainer, ReferenceLine, ComposedChart
   } = Recharts;
 
-  // ── DEFAULTS ─────────────────────────────────────────────────────────────────
+  // ── PALETTE ──────────────────────────────────────────────────────────────────
+  const GOLD     = "#c8a96e";
+  const CREAM    = "#f0ead8";
+  const PLATINUM = "#94b8d4";
+  const NAVY_CARD= "#0c1a2e";
+  const NAVY_DEEP= "#080c04";
+  const DIM      = "#8a7a5a";
+  const TAUPE    = "#b0a080";
+  const G_GREEN  = "#34d399";
+  const G_AMBER  = "#fbbf24";
+  const G_RED    = "#f87171";
+
   const PHASE_COLORS = ["#38bdf8","#fbbf24","#34d399","#a78bfa","#fb923c","#f87171","#e879f9","#22d3ee","#4ade80","#f472b6"];
 
   const DEFAULT_PHASES = [
-    { id:1, name:"Early Family",    startYr:2029, endYr:2038, real:300000, color:"#38bdf8", ages:"43–52", note:"Family trips · school years" },
-    { id:2, name:"Education Spike", startYr:2039, endYr:2046, real:320000, color:"#fbbf24", ages:"53–60", note:"University · peak family spend" },
-    { id:3, name:"Late Family",     startYr:2047, endYr:2048, real:260000, color:"#34d399", ages:"61–62", note:"Son independent" },
-    { id:4, name:"Freedom Couple",  startYr:2049, endYr:2058, real:200000, color:"#a78bfa", ages:"63–72", note:"Travel · couple lifestyle" },
-    { id:5, name:"Early Health",    startYr:2059, endYr:2068, real:240000, color:"#fb923c", ages:"73–82", note:"Medical costs rising" },
-    { id:6, name:"Late Health",     startYr:2069, endYr:2085, real:300000, color:"#f87171", ages:"83–99", note:"Nursing · care facility" },
+    { id:1, name:"Early Family",    startYr:2029, endYr:2038, real:300000, color:"#38bdf8" },
+    { id:2, name:"Education Spike", startYr:2039, endYr:2046, real:320000, color:"#fbbf24" },
+    { id:3, name:"Late Family",     startYr:2047, endYr:2048, real:260000, color:"#34d399" },
+    { id:4, name:"Freedom Couple",  startYr:2049, endYr:2058, real:200000, color:"#a78bfa" },
+    { id:5, name:"Early Health",    startYr:2059, endYr:2068, real:240000, color:"#fb923c" },
+    { id:6, name:"Late Health",     startYr:2069, endYr:2085, real:300000, color:"#f87171" },
   ];
 
-  // ── CORE MATH ─────────────────────────────────────────────────────────────────
-  function getPhase(yr, phases) {
-    return phases.find(p => yr >= p.startYr && yr <= p.endYr);
-  }
+  // ── DRAWDOWN MATH ────────────────────────────────────────────────────────────
+  function getPhase(yr, phases) { return phases.find(p => yr >= p.startYr && yr <= p.endYr); }
 
-  function simulate(startCap, phases, gr, inf, startYr, endYr) {
-    const rows = [];
+  function simulate(startCap, phases, gr, inf, startYr, endYr, birthYr, cpfMonthly, cpfStartAge, lumpSum55) {
+    const rows = [], cpfStartYear = birthYr + cpfStartAge, lump55Year = birthYr + 55;
     let bal = startCap;
     for (let yr = startYr; yr <= endYr; yr++) {
-      const ph   = getPhase(yr, phases);
-      const draw = ph ? ph.real * Math.pow(1 + inf, yr - 2026) : 0;
-      bal = bal * (1 + gr) - draw;
+      const ph = getPhase(yr, phases);
+      const nomDraw = ph ? ph.real * Math.pow(1 + inf, yr - 2026) : 0;
+      const cpfIncome = yr >= cpfStartYear ? cpfMonthly * 12 : 0;
+      const netDraw = Math.max(0, nomDraw - cpfIncome);
+      bal = bal * (1 + gr);
+      const lumpThisYear = (yr === lump55Year && lumpSum55 > 0) ? lumpSum55 : 0;
+      if (lumpThisYear > 0) bal += lumpThisYear;
+      bal -= netDraw;
       rows.push({
-        year:       yr,
-        balance:    Math.max(0, Math.round(bal)),
-        withdrawal: Math.round(draw),
-        phase:      ph?.name ?? "",
-        phColor:    ph?.color ?? "#1e293b",
-        depleted:   bal <= 0,
+        year: yr, balance: Math.max(0, Math.round(bal)),
+        withdrawal: Math.round(nomDraw), netWithdrawal: Math.round(netDraw),
+        cpfIncome: Math.round(cpfIncome), phase: ph?.name ?? "",
+        phColor: ph?.color ?? "#1e293b", depleted: bal <= 0,
+        isCpfStart: yr === cpfStartYear, isLump55: lumpThisYear > 0,
       });
       if (bal <= 0) break;
     }
     return rows;
   }
 
-  function findIdeal(phases, gr, inf, startYr, endYr, target) {
+  function findIdeal(phases, gr, inf, startYr, endYr, target, birthYr, cpfMonthly, cpfStartAge, lumpSum55) {
     if (!phases.length) return 0;
     let lo = 1_000, hi = 100_000_000;
     for (let i = 0; i < 90; i++) {
-      const mid  = (lo + hi) / 2;
-      const rows = simulate(mid, phases, gr, inf, startYr, endYr);
-      const ok   = rows.length === endYr - startYr + 1;
+      const mid = (lo + hi) / 2;
+      const rows = simulate(mid, phases, gr, inf, startYr, endYr, birthYr, cpfMonthly, cpfStartAge, lumpSum55);
+      const ok = rows.length === endYr - startYr + 1;
       const last = ok ? rows[rows.length - 1].balance : -1;
       if (last < target) lo = mid; else hi = mid;
     }
     return Math.ceil((lo + hi) / 2 / 10_000) * 10_000;
   }
 
-  // ── FORMATTERS ────────────────────────────────────────────────────────────────
+  // ── ACCUMULATION MATH ────────────────────────────────────────────────────────
+  function buildAccumulation(current, monthly, gr, fromYr, toYr, magic) {
+    const rows = [], mr = gr / 12;
+    let bal = current, hitYear = null;
+    for (let yr = fromYr; yr <= toYr + 30 && yr <= fromYr + 60; yr++) {
+      for (let m = 0; m < 12; m++) bal = bal * (1 + mr) + monthly;
+      if (bal >= magic && !hitYear) hitYear = yr;
+      rows.push({ year: yr, portfolio: Math.round(bal), target: Math.round(magic) });
+      if (yr > toYr + 5 && bal >= magic) break;
+    }
+    return { rows, hitYear };
+  }
+
+  // ── FORMAT ───────────────────────────────────────────────────────────────────
   function fmt(n, dp = 2) {
     if (!isFinite(n) || n === null) return "—";
-    const abs = Math.abs(n);
-    if (abs >= 1_000_000) return `$${(n / 1_000_000).toFixed(dp)}M`;
-    if (abs >= 1_000)     return `$${Math.round(n).toLocaleString()}`;
+    const a = Math.abs(n);
+    if (a >= 1_000_000) return `$${(n / 1_000_000).toFixed(dp)}M`;
+    if (a >= 1_000)     return `$${Math.round(n).toLocaleString()}`;
     return `$${Math.round(n)}`;
   }
 
-  // ── TOOLTIP ───────────────────────────────────────────────────────────────────
+  // ── TOOLTIP ──────────────────────────────────────────────────────────────────
   function ChartTip({ active, payload, label }) {
     if (!active || !payload?.length) return null;
     return (
-      <div style={{ background:"#0c1a2e", border:"1px solid #3b82f6", borderRadius:8, padding:"10px 14px", fontSize:12, minWidth:180 }}>
-        <div style={{ color:"#64748b", fontFamily:"monospace", marginBottom:6 }}>{label}</div>
-        {payload.map((p, i) => p.value > 0 && (
-          <div key={i} style={{ display:"flex", justifyContent:"space-between", gap:16, color:p.color||"#3b82f6", marginBottom:2 }}>
+      <div style={{ background:"#0c1a2e", border:`1px solid ${GOLD}44`, borderRadius:8, padding:"10px 14px", fontSize:12, minWidth:200 }}>
+        <div style={{ color:DIM, fontFamily:"monospace", marginBottom:6 }}>{label}</div>
+        {payload.map((p, i) => (p.value ?? 0) > 0 && (
+          <div key={i} style={{ display:"flex", justifyContent:"space-between", gap:16, color:p.color||GOLD, marginBottom:2 }}>
             <span>{p.name}</span>
             <span style={{ fontFamily:"monospace", fontWeight:700 }}>{fmt(p.value)}</span>
           </div>
@@ -162,66 +200,51 @@
   // ── PHASE CARD ────────────────────────────────────────────────────────────────
   function PhaseCard({ p, inf, onUpdate, onRemove, canRemove }) {
     const nomFirst = p.real * Math.pow(1 + inf, p.startYr - 2026);
-    const nomLast  = p.real * Math.pow(1 + inf, p.endYr  - 2026);
-    const yrs      = Math.max(0, p.endYr - p.startYr + 1);
-
+    const nomLast  = p.real * Math.pow(1 + inf, p.endYr - 2026);
+    const yrs = Math.max(0, p.endYr - p.startYr + 1);
     return (
       <div className="fade-in" style={{
-        background:"#080f1e", border:`1px solid ${p.color}25`,
-        borderLeft:`3px solid ${p.color}`, borderRadius:11, padding:"16px 16px",
+        background:"#080f0a", border:`1px solid ${p.color}25`,
+        borderLeft:`3px solid ${p.color}`, borderRadius:11, padding:"16px",
         display:"flex", flexDirection:"column", gap:10
       }}>
-        {/* Name row */}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-          <input
-            className="field phase-name-field"
-            value={p.name}
-            style={{ color:p.color, fontSize:13, fontWeight:700, width:"75%", opacity: 0.9 }}
-            onChange={e => onUpdate("name", e.target.value)}
-          />
+          <input className="field phase-name-field" value={p.name}
+            style={{ color:p.color, fontSize:13, fontWeight:700, width:"75%" }}
+            onChange={e => onUpdate("name", e.target.value)} />
           {canRemove && (
-            <button onClick={onRemove}
-              style={{ background:"transparent", border:"1px solid #1e293b", color:"#475569",
-                borderRadius:4, padding:"2px 8px", fontSize:11 }}>✕
-            </button>
+            <button onClick={onRemove} style={{
+              background:"transparent", border:`1px solid ${GOLD}33`,
+              color:DIM, borderRadius:4, padding:"2px 8px", fontSize:11
+            }}>✕</button>
           )}
         </div>
-
-        {/* Year range */}
         <div style={{ display:"flex", gap:8, alignItems:"center" }}>
           <div style={{ flex:1 }}>
-            <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", marginBottom:3, letterSpacing:"0.1em" }}>FROM</div>
+            <div className="input-label">FROM</div>
             <input type="number" className="field" value={p.startYr} min={2020} max={2120} step={1}
-              style={{ fontSize:14, fontWeight:600 }}
-              onChange={e => onUpdate("startYr", +e.target.value)} />
+              style={{ fontSize:14, fontWeight:600 }} onChange={e => onUpdate("startYr", +e.target.value)} />
           </div>
-          <div style={{ color:"#3b82f6", fontSize:16, marginTop:14, flexShrink:0 }}>→</div>
+          <div style={{ color:GOLD, fontSize:16, marginTop:18, flexShrink:0 }}>→</div>
           <div style={{ flex:1 }}>
-            <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", marginBottom:3, letterSpacing:"0.1em" }}>TO</div>
+            <div className="input-label">TO</div>
             <input type="number" className="field" value={p.endYr} min={2020} max={2120} step={1}
-              style={{ fontSize:14, fontWeight:600 }}
-              onChange={e => onUpdate("endYr", +e.target.value)} />
+              style={{ fontSize:14, fontWeight:600 }} onChange={e => onUpdate("endYr", +e.target.value)} />
           </div>
-          <div style={{ color:"#3b82f6", fontSize:10, fontFamily:"monospace", marginTop:14, flexShrink:0 }}>
-            {yrs}yr
-          </div>
+          <div style={{ color:GOLD, fontSize:10, fontFamily:"monospace", marginTop:18, flexShrink:0 }}>{yrs}yr</div>
         </div>
-
-        {/* Drawdown */}
         <div>
-          <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", marginBottom:3, letterSpacing:"0.1em" }}>REAL DRAWDOWN / YR (2026 SGD)</div>
+          <div className="input-label">REAL DRAWDOWN / YR (2026 SGD)</div>
           <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-            <span style={{ color:"#3b82f6", fontFamily:"monospace", fontSize:16, flexShrink:0 }}>$</span>
+            <span style={{ color:GOLD, fontFamily:"monospace", fontSize:16, flexShrink:0 }}>$</span>
             <input type="number" className="field" value={p.real / 1000} min={0} step={10}
               style={{ fontSize:20, fontWeight:700, color:p.color }}
               onChange={e => onUpdate("real", +e.target.value * 1000)} />
-            <span style={{ color:"#3b82f6", fontFamily:"monospace", fontSize:13, flexShrink:0 }}>k</span>
+            <span style={{ color:DIM, fontFamily:"monospace", fontSize:13, flexShrink:0 }}>k</span>
           </div>
         </div>
-
-        {/* Nominal range */}
-        <div style={{ fontSize:10, color:"#3b82f6", fontFamily:"monospace", lineHeight:1.5 }}>
-          {fmt(nomFirst, 1)} → {fmt(nomLast, 1)} nominal
+        <div style={{ fontSize:10, color:DIM, fontFamily:"monospace", lineHeight:1.5 }}>
+          Actual spend: {fmt(nomFirst, 1)} in {p.startYr} → {fmt(nomLast, 1)} by {p.endYr}
         </div>
       </div>
     );
@@ -229,377 +252,570 @@
 
   // ── APP ───────────────────────────────────────────────────────────────────────
   function App() {
+    // model settings
     const [growth, setGrowth]       = useState(6.0);
     const [inflation, setInflation] = useState(2.7);
-    const [endYear, setEndYear]     = useState(2085);
     const [startYear, setStartYear] = useState(2029);
+    const [endYear, setEndYear]     = useState(2085);
     const [birthYear, setBirthYear] = useState(1986);
     const [target, setTarget]       = useState(2_000_000);
     const [phases, setPhases]       = useState(DEFAULT_PHASES);
+
+    // CPF
+    const [cpfMonthly, setCpfMonthly]   = useState(0);
+    const [cpfStartAge, setCpfStartAge] = useState(65);
+    const [lumpSum55, setLumpSum55]     = useState(0);
+
+    // accumulation
+    const [accPortfolio, setAccPortfolio] = useState(3_900_000);
+    const [accMonthly, setAccMonthly]     = useState(18_000);
+    const [accGrowth, setAccGrowth]       = useState(6.0);
+    const ACC_YEAR = 2026;
+
+    // what-if slider (lives inside §3)
     const [capOverride, setCapOverride] = useState(null);
 
     const gr  = growth    / 100;
     const inf = inflation / 100;
 
     const idealCap = useMemo(() =>
-      findIdeal(phases, gr, inf, startYear, endYear, target),
-      [phases, gr, inf, startYear, endYear, target]
+      findIdeal(phases, gr, inf, startYear, endYear, target, birthYear, cpfMonthly, cpfStartAge, lumpSum55),
+      [phases, gr, inf, startYear, endYear, target, birthYear, cpfMonthly, cpfStartAge, lumpSum55]
     );
 
-    // when ideal recomputes, if user hasn't manually set cap, follow ideal
     const displayCap = capOverride ?? idealCap;
-
-    const sliderMin = Math.max(100_000,  idealCap * 0.4);
-    const sliderMax = Math.max(20_000_000, idealCap * 1.8);
+    const sliderMin  = Math.max(100_000,    idealCap * 0.5);
+    const sliderMax  = Math.max(20_000_000, idealCap * 1.6);
 
     const data = useMemo(() =>
-      simulate(displayCap, phases, gr, inf, startYear, endYear),
-      [displayCap, phases, gr, inf, startYear, endYear]
+      simulate(displayCap, phases, gr, inf, startYear, endYear, birthYear, cpfMonthly, cpfStartAge, lumpSum55),
+      [displayCap, phases, gr, inf, startYear, endYear, birthYear, cpfMonthly, cpfStartAge, lumpSum55]
     );
 
-    const complete  = data.length === endYear - startYear + 1;
-    const finalBal  = complete ? data[data.length - 1].balance : 0;
-    const depleted  = !complete;
-    const depYear   = depleted ? (data[data.length - 1]?.year ?? "?") : null;
-    const peakRow   = data.reduce((b, d) => d.balance > b.balance ? d : b, data[0] ?? { balance:0, year:startYear });
-    const totalDrawn = data.reduce((s, d) => s + d.withdrawal, 0);
-    const lastDraw  = data.length ? data[data.length - 1].withdrawal : 0;
+    const { rows: accRows, hitYear } = useMemo(() =>
+      buildAccumulation(accPortfolio, accMonthly, accGrowth / 100, ACC_YEAR, startYear, idealCap),
+      [accPortfolio, accMonthly, accGrowth, startYear, idealCap]
+    );
 
-    const statusTxt = depleted
-      ? `⚠ Depleted ${depYear}`
+    const complete    = data.length === endYear - startYear + 1;
+    const finalBal    = complete ? data[data.length - 1].balance : 0;
+    const depleted    = !complete;
+    const depYear     = depleted ? (data[data.length - 1]?.year ?? "?") : null;
+    const peakRow     = data.reduce((b, d) => d.balance > b.balance ? d : b, data[0] ?? { balance:0, year:startYear });
+    const totalDrawn  = data.reduce((s, d) => s + d.netWithdrawal, 0);
+    const totalCpf    = data.reduce((s, d) => s + d.cpfIncome, 0);
+    const hasCpf      = cpfMonthly > 0;
+    const hasLump     = lumpSum55 > 0;
+    const cpfStartYear = birthYear + cpfStartAge;
+    const lump55Year   = birthYear + 55;
+
+    const yearsToGoal     = hitYear ? hitYear - ACC_YEAR : null;
+    const onTrack         = hitYear !== null && hitYear <= startYear;
+    const currentAtStart  = accRows.find(r => r.year === startYear)?.portfolio ?? 0;
+    const shortfall       = idealCap - currentAtStart;
+
+    const drawdownStatus = depleted
+      ? { txt:`⚠ Depleted ${depYear}`, col:G_RED }
       : finalBal >= target
-      ? `✓ Ends ${fmt(finalBal)}`
-      : `⚠ Ends ${fmt(finalBal)} — below $${(target/1e6).toFixed(1)}M target`;
-    const statusCol = depleted ? "#f87171" : finalBal >= target ? "#34d399" : "#fbbf24";
+      ? { txt:`✓ Ends ${fmt(finalBal)}`, col:G_GREEN }
+      : { txt:`⚠ Ends ${fmt(finalBal)} — below $${(target/1e6).toFixed(1)}M target`, col:G_AMBER };
 
     const milestones = data.filter(d =>
       d.year === startYear || d.year === endYear || (d.year - startYear) % 4 === 0
     );
 
-    const resetCap = () => setCapOverride(null);
-
     const updatePhase = useCallback((id, field, val) => {
       setPhases(ps => ps.map(p => p.id === id ? { ...p, [field]: val } : p));
       setCapOverride(null);
     }, []);
-
     const removePhase = useCallback((id) => {
       setPhases(ps => ps.filter(p => p.id !== id));
       setCapOverride(null);
     }, []);
-
     const addPhase = useCallback(() => {
       const last = phases[phases.length - 1];
-      const newId = Date.now();
       const color = PHASE_COLORS[phases.length % PHASE_COLORS.length];
       setPhases(ps => [...ps, {
-        id: newId,
-        name: `Phase ${ps.length + 1}`,
+        id: Date.now(), name: `Phase ${ps.length + 1}`,
         startYr: last ? last.endYr + 1 : startYear,
         endYr:   last ? last.endYr + 6 : startYear + 5,
-        real:    250_000,
-        color,
-        note: ""
+        real: 250_000, color
       }]);
       setCapOverride(null);
     }, [phases, startYear]);
 
-    // ── RENDER ──────────────────────────────────────────────────────────────────
+    const settingCell = (label, input, hint) => (
+      <div className="input-cell">
+        <div className="input-label">{label}</div>
+        {input}
+        {hint && <div className="input-hint">{hint}</div>}
+      </div>
+    );
+
     return (
-      <div style={{ maxWidth:1080, margin:"0 auto", padding:"36px 24px 60px" }}>
+      <div style={{ maxWidth:1080, margin:"0 auto", padding:"40px 24px 60px" }}>
 
         {/* ── HEADER ── */}
-        <div style={{ marginBottom:32 }}>
-          <div style={{ fontSize:9, letterSpacing:"0.25em", color:"#3b82f6", fontFamily:"monospace", marginBottom:6 }}>
-            the betahuman · NOT Financial Advice
+        <div style={{ marginBottom:36 }}>
+          <div style={{ fontSize:10, letterSpacing:"0.28em", color:GOLD, fontFamily:"monospace", marginBottom:8 }}>
+            THE BETAHUMAN · NOT FINANCIAL ADVICE · SGD
           </div>
-          <h1 style={{ fontSize:34, fontWeight:700, color:"#f8fafc", letterSpacing:"-0.02em", marginBottom:4 }}>
+          <h1 style={{ fontSize:36, fontWeight:700, color:CREAM, letterSpacing:"-0.02em", marginBottom:6 }}>
             Financial Freedom Planner
           </h1>
-          <p style={{ color:"#3b82f6", fontSize:13, fontStyle:"italic" }}>
-            All values in SGD
+          <p style={{ color:GOLD, fontSize:13, fontStyle:"italic" }}>
+            Set your retirement parameters → discover your magic number → track your path → plan the life after
           </p>
         </div>
 
-        {/* ─────────────────────────────────────────────────────────────────────── */}
-        {/* § 1 — SLIDER */}
-        {/* ─────────────────────────────────────────────────────────────────────── */}
-        <div className="card" style={{ background:"#0c1a2e", border:"1px solid #1e293b", marginBottom:18 }}>
-          <div className="section-tag">§ 1 — Starting Capital</div>
-          <div style={{ display:"flex", alignItems:"center", gap:20, flexWrap:"wrap" }}>
-            <div style={{ flex:1, minWidth:220 }}>
-              <input type="range"
-                min={sliderMin} max={sliderMax} step={50_000}
-                value={displayCap}
-                onChange={e => setCapOverride(+e.target.value)}
-                style={{ width:"100%", marginBottom:6 }}
-              />
-              <div style={{ display:"flex", justifyContent:"space-between", fontSize:9, fontFamily:"monospace", color:"#3b82f6" }}>
-                <span>{fmt(sliderMin, 1)}</span><span>{fmt(sliderMax, 1)}</span>
+        {/* ════════════════════════════════════════════════════════════════════
+            § 1 — MODEL SETTINGS + CPF
+        ════════════════════════════════════════════════════════════════════ */}
+        <div className="card" style={{ background:NAVY_CARD, border:`1px solid ${GOLD}33`, marginBottom:0 }}>
+          <div className="section-tag">§ 1 — Your Retirement Parameters</div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:10, marginBottom:10 }}>
+
+            {settingCell("GROWTH RATE (% P.A.)",
+              <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                <input type="number" className="field" value={growth} step={0.1} min={0.1} max={30}
+                  style={{ fontSize:20, fontWeight:700, color:G_GREEN }}
+                  onChange={e => { setGrowth(+e.target.value); setCapOverride(null); }} />
+                <span style={{ color:DIM, fontFamily:"monospace" }}>%</span>
               </div>
-            </div>
-            <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-start", gap:4 }}>
-              <div className="kpi-val" style={{ fontSize:34, color: displayCap >= idealCap ? "#34d399" : "#f87171" }}>
-                {fmt(displayCap)}
-              </div>
-              <div style={{ fontSize:12, fontFamily:"monospace", color: statusCol }}>
-                {statusTxt}
-              </div>
-            </div>
-            <button onClick={resetCap} style={{
-              padding:"8px 18px", borderRadius:7, border:"1px solid #3b82f6",
-              background:"#3b82f622", color:"#60a5fa", fontSize:11, letterSpacing:"0.06em"
-            }}>RESET TO IDEAL</button>
+            )}
+
+            {settingCell("INFLATION (% P.A.)",
+              <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                <input type="number" className="field" value={inflation} step={0.1} min={0} max={20}
+                  style={{ fontSize:20, fontWeight:700, color:"#fb923c" }}
+                  onChange={e => { setInflation(+e.target.value); setCapOverride(null); }} />
+                <span style={{ color:DIM, fontFamily:"monospace" }}>%</span>
+              </div>,
+              `Real net return: ${(growth - inflation).toFixed(1)}% p.a.`
+            )}
+
+            {settingCell("BIRTH YEAR",
+              <input type="number" className="field" value={birthYear} step={1} min={1940} max={2010}
+                style={{ fontSize:20, fontWeight:700, color:"#e879f9" }}
+                onChange={e => setBirthYear(Math.round(+e.target.value)) } />,
+              `Age at retirement: ${startYear - birthYear}`
+            )}
+
+            {settingCell("RETIREMENT START YEAR",
+              <input type="number" className="field" value={startYear} step={1} min={2024} max={2080}
+                style={{ fontSize:20, fontWeight:700, color:G_GREEN }}
+                onChange={e => { setStartYear(Math.round(+e.target.value)); setCapOverride(null); }} />
+            )}
+
+            {settingCell("PLAN END YEAR",
+              <input type="number" className="field" value={endYear} step={1} min={2030} max={2150}
+                style={{ fontSize:20, fontWeight:700, color:"#a78bfa" }}
+                onChange={e => { setEndYear(Math.round(+e.target.value)); setCapOverride(null); }} />,
+              `${endYear - startYear + 1} year plan · ${startYear} → ${endYear}`
+            )}
+
+            {settingCell("END BALANCE TARGET",
+              <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+                <span style={{ color:GOLD, fontFamily:"monospace" }}>$</span>
+                <input type="number" className="field" value={target / 1000} step={100} min={0}
+                  style={{ fontSize:20, fontWeight:700, color:"#38bdf8" }}
+                  onChange={e => { setTarget(+e.target.value * 1000); setCapOverride(null); }} />
+                <span style={{ color:DIM, fontFamily:"monospace" }}>k</span>
+              </div>,
+              "What you want left at end year"
+            )}
           </div>
-          {capOverride !== null && capOverride < idealCap && (
-            <div style={{ marginTop:12, fontSize:12, color:"#fbbf24", fontFamily:"monospace", paddingTop:10, borderTop:"1px solid #0f2030" }}>
-              {fmt(idealCap - capOverride)} below ideal — portfolio may not reach {endYear}
+
+          {/* CPF block */}
+          <div className="cpf-section">
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:10, marginBottom:14 }}>
+              <div>
+                <div style={{ fontSize:10, color:PLATINUM, fontFamily:"monospace", letterSpacing:"0.18em", marginBottom:4, textTransform:"uppercase" }}>CPF Integration</div>
+                <div style={{ fontSize:11, color:GOLD, lineHeight:1.6 }}>
+                  CPF LIFE income offsets your portfolio drawdown · lump sum at 55 injects into your portfolio
+                </div>
+              </div>
+              <a href="https://www.cpf.gov.sg/payoutestimator" target="_blank" rel="noopener noreferrer" className="cpf-link">
+                <span>↗</span> CPF Payout Estimator
+              </a>
             </div>
-          )}
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
+              <div style={{ background:"#040e1a", borderRadius:8, padding:"12px" }}>
+                <div style={{ fontSize:10, color:PLATINUM, fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:5, textTransform:"uppercase" }}>CPF LIFE Payout / Month</div>
+                <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+                  <span style={{ color:GOLD, fontFamily:"monospace", flexShrink:0 }}>$</span>
+                  <input type="number" className="field" value={cpfMonthly} min={0} step={100}
+                    style={{ fontSize:18, fontWeight:700, color:PLATINUM, border:`1px solid ${PLATINUM}44` }}
+                    onChange={e => { setCpfMonthly(+e.target.value); setCapOverride(null); }} />
+                </div>
+                <div style={{ fontSize:10, color:GOLD, fontFamily:"monospace", marginTop:5 }}>combined both persons</div>
+                {cpfMonthly > 0 && <div style={{ fontSize:10, color:PLATINUM, fontFamily:"monospace", marginTop:4 }}>= {fmt(cpfMonthly * 12)} / yr</div>}
+              </div>
+              <div style={{ background:"#040e1a", borderRadius:8, padding:"12px" }}>
+                <div style={{ fontSize:10, color:PLATINUM, fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:5, textTransform:"uppercase" }}>CPF LIFE Start Age</div>
+                <input type="number" className="field" value={cpfStartAge} min={55} max={70} step={1}
+                  style={{ fontSize:18, fontWeight:700, color:PLATINUM, border:`1px solid ${PLATINUM}44` }}
+                  onChange={e => { setCpfStartAge(Math.round(+e.target.value)); setCapOverride(null); }} />
+                <div style={{ fontSize:10, color:GOLD, fontFamily:"monospace", marginTop:5 }}>defaults to 65 · adjust for policy risk</div>
+                <div style={{ fontSize:10, color:PLATINUM, fontFamily:"monospace", marginTop:4 }}>= year {cpfStartYear}</div>
+              </div>
+              <div style={{ background:"#040e1a", borderRadius:8, padding:"12px" }}>
+                <div style={{ fontSize:10, color:PLATINUM, fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:5, textTransform:"uppercase" }}>Lump Sum at 55 (Above FRS)</div>
+                <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+                  <span style={{ color:GOLD, fontFamily:"monospace", flexShrink:0 }}>$</span>
+                  <input type="number" className="field" value={lumpSum55 / 1000} min={0} step={10}
+                    style={{ fontSize:18, fontWeight:700, color:"#a78bfa", border:"1px solid #a78bfa44" }}
+                    onChange={e => { setLumpSum55(+e.target.value * 1000); setCapOverride(null); }} />
+                  <span style={{ color:DIM, fontFamily:"monospace", flexShrink:0 }}>k</span>
+                </div>
+                <div style={{ fontSize:10, color:GOLD, fontFamily:"monospace", marginTop:5 }}>OA excess above FRS at 55</div>
+                <div style={{ fontSize:10, color:"#a78bfa", fontFamily:"monospace", marginTop:4 }}>injected in {lump55Year} (age 55)</div>
+              </div>
+            </div>
+            <div style={{ marginTop:12, padding:"10px 12px", background:"#040e1a", borderRadius:7, fontSize:11, color:GOLD, lineHeight:1.8, fontStyle:"italic" }}>
+              <span style={{ color:`${GOLD}88`, fontStyle:"normal" }}>ⓘ </span>
+              CPF policy changes over time — withdrawal age and FRS amounts have shifted before. Use CPF start age to stress-test later payout ages. Treat all CPF inputs as estimates, not guarantees.
+            </div>
+          </div>
         </div>
 
-        {/* ─────────────────────────────────────────────────────────────────────── */}
-        {/* § 2 — IDEAL CAPITAL + SETTINGS */}
-        {/* ─────────────────────────────────────────────────────────────────────── */}
-        <div className="card" style={{
-          background:"linear-gradient(135deg, #0c1f40 0%, #081628 100%)",
-          border:"1px solid #3b82f6", marginBottom:18
-        }}>
-          <div className="section-tag" style={{ color:"#3b82f6" }}>§ 2 — Ideal Starting Capital + Model Settings</div>
-          <div style={{ display:"flex", gap:28, flexWrap:"wrap", alignItems:"flex-start" }}>
+        {/* ── CONNECTOR 1 ── */}
+        <div className="connector">
+          <div className="connector-line" />
+          <div className="connector-pill">YOUR PARAMETERS ARE SET · HERE IS YOUR MAGIC NUMBER</div>
+          <div className="connector-line" />
+        </div>
 
-            {/* Ideal number */}
-            <div style={{ minWidth:220 }}>
-              <div style={{ fontSize:9, color:"#3b82f6", letterSpacing:"0.2em", fontFamily:"monospace", marginBottom:10 }}>
-                IDEAL STARTING CAPITAL
+        {/* ════════════════════════════════════════════════════════════════════
+            § 2 — YOUR MAGIC NUMBER (output from §1)
+        ════════════════════════════════════════════════════════════════════ */}
+        <div className="card" style={{ background:`linear-gradient(135deg, #0c1f40 0%, #081628 100%)`, border:`1px solid ${GOLD}66`, marginBottom:0 }}>
+          <div className="section-tag">§ 2 — Your Magic Number</div>
+          <div style={{ display:"flex", gap:32, flexWrap:"wrap", alignItems:"flex-start" }}>
+
+            {/* Big number */}
+            <div style={{ minWidth:240 }}>
+              <div style={{ fontSize:10, color:GOLD, letterSpacing:"0.2em", fontFamily:"monospace", marginBottom:10, textTransform:"uppercase" }}>Ideal Starting Capital at {startYear}</div>
+              <div className="kpi-val" style={{ fontSize:56, color:CREAM, lineHeight:1 }}>{fmt(idealCap)}</div>
+              <div style={{ fontSize:13, color:GOLD, marginTop:10, lineHeight:1.7 }}>
+                to sustain all phases and end {endYear} with {fmt(target)}
               </div>
-              <div className="kpi-val" style={{ fontSize:52, color:"#fff", lineHeight:1 }}>
-                {fmt(idealCap)}
+              <div style={{ marginTop:14, display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                {[
+                  { l:"Real net return", v:`${(growth - inflation).toFixed(1)}% p.a.`, c: growth > inflation ? G_GREEN : G_RED },
+                  { l:"Plan duration",  v:`${endYear - startYear + 1} yrs`,            c:GOLD },
+                  { l:"Age at start",   v:`${startYear - birthYear}`,                   c:"#e879f9" },
+                  { l:"Age at end",     v:`${endYear - birthYear}`,                     c:TAUPE },
+                ].map(k => (
+                  <div key={k.l} style={{ background:"#071020", borderRadius:7, padding:"8px 10px" }}>
+                    <div style={{ fontSize:10, color:GOLD, fontFamily:"monospace", marginBottom:3 }}>{k.l}</div>
+                    <div className="kpi-val" style={{ fontSize:16, color:k.c }}>{k.v}</div>
+                  </div>
+                ))}
               </div>
-              <div style={{ fontSize:12, color:"#3b82f6", marginTop:10, lineHeight:1.6 }}>
-                to sustain all phases<br />and end {endYear} with {fmt(target)}
-              </div>
-              <div style={{ marginTop:14, padding:"10px 12px", background:"#071020", borderRadius:8, fontFamily:"monospace", fontSize:13 }}>
-                <span style={{ color:"#3b82f6" }}>Real net return: </span>
-                <span style={{ color: growth > inflation ? "#34d399" : "#f87171", fontWeight:700 }}>
-                  {(growth - inflation).toFixed(1)}% p.a.
-                </span>
-              </div>
+              {(hasCpf || hasLump) && (
+                <div style={{ marginTop:10, padding:"10px 12px", background:"#071828", border:`1px solid ${PLATINUM}22`, borderRadius:8, fontSize:12, lineHeight:1.8 }}>
+                  {hasCpf && <div style={{ color:PLATINUM, fontFamily:"monospace" }}>CPF offsets {fmt(totalCpf, 1)} total from portfolio</div>}
+                  {hasLump && <div style={{ color:"#a78bfa", fontFamily:"monospace", marginTop: hasCpf ? 4 : 0 }}>Lump sum {fmt(lumpSum55)} injected in {lump55Year}</div>}
+                </div>
+              )}
             </div>
 
-            {/* Settings */}
-            <div style={{ flex:1, minWidth:280 }}>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-                {/* Growth */}
-                <div style={{ background:"#071020", borderRadius:9, padding:"12px 14px" }}>
-                  <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>GROWTH RATE (% P.A.)</div>
-                  <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                    <input type="number" className="field" value={growth} step={0.1} min={0.1} max={30}
-                      style={{ fontSize:20, fontWeight:700, color:"#34d399" }}
-                      onChange={e => { setGrowth(+e.target.value); setCapOverride(null); }} />
-                    <span style={{ color:"#3b82f6", fontFamily:"monospace" }}>%</span>
-                  </div>
+            {/* What-if slider */}
+            <div style={{ flex:1, minWidth:260 }}>
+              <div style={{ fontSize:10, color:GOLD, fontFamily:"monospace", letterSpacing:"0.12em", marginBottom:10, textTransform:"uppercase" }}>What-if · Adjust Starting Capital</div>
+              <div style={{ background:"#071020", borderRadius:10, padding:"18px 18px" }}>
+                <input type="range" min={sliderMin} max={sliderMax} step={50_000}
+                  value={displayCap} onChange={e => setCapOverride(+e.target.value)}
+                  style={{ width:"100%", marginBottom:8 }} />
+                <div style={{ display:"flex", justifyContent:"space-between", fontSize:10, fontFamily:"monospace", color:GOLD, marginBottom:14 }}>
+                  <span>{fmt(sliderMin, 1)}</span><span>{fmt(sliderMax, 1)}</span>
                 </div>
-
-                {/* Inflation */}
-                <div style={{ background:"#071020", borderRadius:9, padding:"12px 14px" }}>
-                  <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>INFLATION (% P.A.)</div>
-                  <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                    <input type="number" className="field" value={inflation} step={0.1} min={0} max={20}
-                      style={{ fontSize:20, fontWeight:700, color:"#fb923c" }}
-                      onChange={e => { setInflation(+e.target.value); setCapOverride(null); }} />
-                    <span style={{ color:"#3b82f6", fontFamily:"monospace" }}>%</span>
-                  </div>
-                </div>
-
-                {/* Start Year — NEW */}
-                <div style={{ background:"#071020", borderRadius:9, padding:"12px 14px" }}>
-                  <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>START YEAR (RETIREMENT)</div>
-                  <input type="number" className="field" value={startYear} step={1} min={2024} max={2080}
-                    style={{ fontSize:20, fontWeight:700, color:"#34d399" }}
-                    onChange={e => { setStartYear(Math.round(+e.target.value)); setCapOverride(null); }} />
-                </div>
-
-                {/* Birth Year — NEW */}
-                <div style={{ background:"#071020", borderRadius:9, padding:"12px 14px" }}>
-                  <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>BIRTH YEAR</div>
-                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                    <input type="number" className="field" value={birthYear} step={1} min={1940} max={2010}
-                      style={{ fontSize:20, fontWeight:700, color:"#e879f9" }}
-                      onChange={e => { setBirthYear(Math.round(+e.target.value)); }} />
-                  </div>
-                  <div style={{ fontSize:9, color:"#3b82f6", fontFamily:"monospace", marginTop:5 }}>
-                    Age at retirement: {startYear - birthYear}
-                  </div>
-                </div>
-
-                {/* End Year */}
-                <div style={{ background:"#071020", borderRadius:9, padding:"12px 14px" }}>
-                  <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>END YEAR</div>
-                  <input type="number" className="field" value={endYear} step={1} min={2030} max={2150}
-                    style={{ fontSize:20, fontWeight:700, color:"#a78bfa" }}
-                    onChange={e => { setEndYear(Math.round(+e.target.value)); setCapOverride(null); }} />
-                </div>
-
-                {/* Target end balance */}
-                <div style={{ background:"#071020", borderRadius:9, padding:"12px 14px" }}>
-                  <div style={{ fontSize:8, color:"#3b82f6", fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:6 }}>END BALANCE TARGET ($)</div>
-                  <div style={{ display:"flex", alignItems:"center", gap:4 }}>
-                    <span style={{ color:"#3b82f6", fontFamily:"monospace" }}>$</span>
-                    <input type="number" className="field" value={target / 1000} step={100} min={0}
-                      style={{ fontSize:20, fontWeight:700, color:"#38bdf8" }}
-                      onChange={e => { setTarget(+e.target.value * 1000); setCapOverride(null); }} />
-                    <span style={{ color:"#3b82f6", fontFamily:"monospace" }}>k</span>
-                  </div>
-                </div>
-
-                {/* Duration + phase count summary */}
-                <div style={{ gridColumn:"span 2", background:"#071020", borderRadius:9, padding:"10px 14px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:10 }}>
                   <div>
-                    <span style={{ fontSize:9, color:"#3b82f6", fontFamily:"monospace", letterSpacing:"0.1em" }}>DURATION </span>
-                    <span style={{ fontFamily:"monospace", color:"#64748b", fontSize:14, fontWeight:700 }}>{endYear - startYear + 1} years</span>
-                    <span style={{ fontSize:9, color:"#1e293b", fontFamily:"monospace", marginLeft:12 }}>PHASES </span>
-                    <span style={{ fontFamily:"monospace", color:"#64748b", fontSize:14, fontWeight:700 }}>{phases.length}</span>
+                    <div className="kpi-val" style={{ fontSize:28, color: displayCap >= idealCap ? G_GREEN : G_RED }}>
+                      {fmt(displayCap)}
+                    </div>
+                    <div style={{ fontSize:11, fontFamily:"monospace", color:drawdownStatus.col, marginTop:4 }}>
+                      {drawdownStatus.txt}
+                    </div>
                   </div>
-                  <div style={{ fontFamily:"monospace", fontSize:11, color:"#3b82f6" }}>
-                    {startYear} → {endYear}
-                  </div>
+                  <button onClick={() => setCapOverride(null)} style={{
+                    padding:"7px 16px", borderRadius:6, border:`1px solid ${GOLD}55`,
+                    background:`${GOLD}11`, color:GOLD, fontSize:10, letterSpacing:"0.06em"
+                  }}>RESET TO IDEAL</button>
                 </div>
+                {capOverride !== null && capOverride < idealCap && (
+                  <div style={{ marginTop:10, fontSize:11, color:G_AMBER, fontFamily:"monospace", paddingTop:10, borderTop:`1px solid ${GOLD}22` }}>
+                    {fmt(idealCap - capOverride)} below ideal
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* ─────────────────────────────────────────────────────────────────────── */}
-        {/* § 3 — PHASES */}
-        {/* ─────────────────────────────────────────────────────────────────────── */}
-        <div className="card" style={{ background:"#0c1a2e", border:"1px solid #1e293b", marginBottom:18 }}>
+        {/* ── CONNECTOR 2 ── */}
+        <div className="connector">
+          <div className="connector-line" />
+          <div className="connector-pill">YOUR GOAL IS SET · NOW — HOW LONG TO GET THERE?</div>
+          <div className="connector-line" />
+        </div>
+
+        {/* ════════════════════════════════════════════════════════════════════
+            § 3 — ACCUMULATION TRACKER
+        ════════════════════════════════════════════════════════════════════ */}
+        <div className="card" style={{
+          background:`linear-gradient(135deg, #0a1f10 0%, #081628 100%)`,
+          border:`1px solid ${onTrack ? G_GREEN+"44" : G_AMBER+"44"}`,
+          marginBottom:0
+        }}>
+          <div className="section-tag" style={{ color: onTrack ? G_GREEN : G_AMBER }}>§ 3 — Accumulation Tracker · How Long to Your Magic Number?</div>
+
+          {/* Status banner */}
+          <div style={{
+            background: onTrack ? "#34d39912" : "#fbbf2410",
+            border:`1px solid ${onTrack ? G_GREEN+"33" : G_AMBER+"33"}`,
+            borderRadius:10, padding:"16px 20px", marginBottom:20,
+            display:"flex", gap:24, alignItems:"center", flexWrap:"wrap"
+          }}>
+            <div style={{ flex:1, minWidth:200 }}>
+              <div style={{ fontSize:10, color: onTrack ? G_GREEN : G_AMBER, fontFamily:"monospace", letterSpacing:"0.15em", marginBottom:6, textTransform:"uppercase" }}>
+                {onTrack ? "✓ On Track" : hitYear ? "⚠ Needs More Time or Contributions" : "⚠ Cannot Reach Target on Current Trajectory"}
+              </div>
+              <div className="kpi-val" style={{ fontSize:32, color:CREAM, lineHeight:1.1 }}>
+                {hitYear ? `${fmt(idealCap)} by ${hitYear}` : "Target not reached"}
+              </div>
+              <div style={{ fontSize:12, color:GOLD, marginTop:6, fontFamily:"monospace" }}>
+                {hitYear ? `${yearsToGoal} year${yearsToGoal !== 1 ? "s" : ""} from now · age ${hitYear - birthYear}` : "Increase contributions or reduce your target"}
+              </div>
+            </div>
+            <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
+              {[
+                { l:`Portfolio at ${startYear}`, v:fmt(currentAtStart), c:"#38bdf8" },
+                { l: shortfall <= 0 ? "Surplus at target" : `Shortfall at ${startYear}`,
+                  v:fmt(Math.abs(shortfall)), c: shortfall <= 0 ? G_GREEN : G_RED },
+              ].map(k => (
+                <div key={k.l} style={{ background:"#071020", borderRadius:8, padding:"12px 16px", minWidth:148 }}>
+                  <div style={{ fontSize:10, color:GOLD, fontFamily:"monospace", letterSpacing:"0.1em", marginBottom:5, textTransform:"uppercase" }}>{k.l}</div>
+                  <div className="kpi-val" style={{ fontSize:20, color:k.c }}>{k.v}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Inputs */}
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:10, marginBottom:20 }}>
+            <div className="input-cell">
+              <div className="input-label">Current Portfolio ($)</div>
+              <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+                <span style={{ color:GOLD, fontFamily:"monospace" }}>$</span>
+                <input type="number" className="field" value={accPortfolio / 1000} min={0} step={50}
+                  style={{ fontSize:18, fontWeight:700, color:G_GREEN }}
+                  onChange={e => setAccPortfolio(+e.target.value * 1000)} />
+                <span style={{ color:DIM, fontFamily:"monospace" }}>k</span>
+              </div>
+              <div className="input-hint">as of {ACC_YEAR}</div>
+            </div>
+            <div className="input-cell">
+              <div className="input-label">Monthly Contribution ($)</div>
+              <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+                <span style={{ color:GOLD, fontFamily:"monospace" }}>$</span>
+                <input type="number" className="field" value={accMonthly} min={0} step={500}
+                  style={{ fontSize:18, fontWeight:700, color:G_GREEN }}
+                  onChange={e => setAccMonthly(+e.target.value)} />
+              </div>
+              <div className="input-hint">per month, ongoing</div>
+            </div>
+            <div className="input-cell">
+              <div className="input-label">Growth Rate (% p.a.)</div>
+              <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                <input type="number" className="field" value={accGrowth} step={0.1} min={0.1} max={30}
+                  style={{ fontSize:18, fontWeight:700, color:G_GREEN }}
+                  onChange={e => setAccGrowth(+e.target.value)} />
+                <span style={{ color:DIM, fontFamily:"monospace" }}>%</span>
+              </div>
+              <div className="input-hint">independent of drawdown rate</div>
+            </div>
+          </div>
+
+          {/* Accumulation chart */}
+          <ResponsiveContainer width="100%" height={250}>
+            <ComposedChart data={accRows} margin={{ top:4, right:8, bottom:0, left:0 }}>
+              <defs>
+                <linearGradient id="accGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%"  stopColor={G_GREEN} stopOpacity={0.3} />
+                  <stop offset="95%" stopColor={G_GREEN} stopOpacity={0.02} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#0a1828" />
+              <XAxis dataKey="year" tick={{ fill:GOLD, fontSize:10, fontFamily:"monospace" }} />
+              <YAxis tickFormatter={v => fmt(v, 1)} tick={{ fill:GOLD, fontSize:10, fontFamily:"monospace" }} width={80} />
+              <Tooltip content={<ChartTip />} />
+              <ReferenceLine y={idealCap} stroke={GOLD} strokeDasharray="6 3"
+                label={{ value:`Magic number ${fmt(idealCap, 1)}`, fill:GOLD, fontSize:10, position:"insideTopRight" }} />
+              <ReferenceLine x={startYear} stroke={G_AMBER} strokeDasharray="4 2"
+                label={{ value:`Retire ${startYear}`, fill:GOLD, fontSize:10, position:"insideTopRight" }} />
+              {hitYear && hitYear !== startYear && (
+                <ReferenceLine x={hitYear} stroke={G_GREEN} strokeDasharray="4 2"
+                  label={{ value:`Goal ${hitYear}`, fill:GOLD, fontSize:10, position:"insideBottomRight" }} />
+              )}
+              <Area type="monotone" dataKey="portfolio" name="Portfolio Value"
+                stroke={G_GREEN} fill="url(#accGrad)" strokeWidth={2} dot={false} />
+            </ComposedChart>
+          </ResponsiveContainer>
+
+          <div style={{ marginTop:14, padding:"10px 14px", background:"#071020", borderRadius:8, fontSize:11, color:GOLD, lineHeight:1.8, fontStyle:"italic" }}>
+            <span style={{ color:`${GOLD}88`, fontStyle:"normal" }}>ⓘ </span>
+            This is a straight-line projection at a fixed growth rate. It does not account for market volatility, income changes, or CPF accumulation running alongside. Use it for direction, not precision. The gold dashed line is your magic number from §2 — it updates automatically as you change your retirement settings.
+          </div>
+        </div>
+
+        {/* ── CONNECTOR 3 ── */}
+        <div className="connector">
+          <div className="connector-line" />
+          <div className="connector-pill">NOW PLAN WHAT HAPPENS AFTER YOU RETIRE</div>
+          <div className="connector-line" />
+        </div>
+
+        {/* ════════════════════════════════════════════════════════════════════
+            § 4 — DRAWDOWN PHASES
+        ════════════════════════════════════════════════════════════════════ */}
+        <div className="card" style={{ background:NAVY_CARD, border:`1px solid ${GOLD}33`, marginBottom:18 }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
-            <div className="section-tag" style={{ marginBottom:0 }}>§ 3 — Drawdown Phases</div>
+            <div className="section-tag" style={{ marginBottom:0 }}>§ 4 — Drawdown Phases</div>
             <button onClick={addPhase} style={{
-              padding:"6px 14px", borderRadius:6, border:"1px solid #34d399",
-              background:"#34d39915", color:"#34d399", fontSize:11, letterSpacing:"0.06em"
+              padding:"6px 14px", borderRadius:6, border:`1px solid ${G_GREEN}`,
+              background:`${G_GREEN}15`, color:G_GREEN, fontSize:10, letterSpacing:"0.06em"
             }}>+ ADD PHASE</button>
           </div>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(270px, 1fr))", gap:12 }}>
             {phases.map(p => (
-              <PhaseCard
-                key={p.id}
-                p={p}
-                inf={inf}
-                onUpdate={(field, val) => updatePhase(p.id, field, val)}
+              <PhaseCard key={p.id} p={p} inf={inf}
+                onUpdate={(f, v) => updatePhase(p.id, f, v)}
                 onRemove={() => removePhase(p.id)}
-                canRemove={phases.length > 1}
-              />
+                canRemove={phases.length > 1} />
             ))}
           </div>
         </div>
 
-        {/* ─────────────────────────────────────────────────────────────────────── */}
-        {/* KPI ROW */}
-        {/* ─────────────────────────────────────────────────────────────────────── */}
+        {/* ── KPI ROW ── */}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10, marginBottom:18 }}>
           {[
-            { l:"Ideal Capital",   v:fmt(idealCap),                  s:`Required start (${startYear})`,         c:"#60a5fa" },
-            { l:"Peak Portfolio",  v:fmt(peakRow?.balance ?? 0),     s:`Year ${peakRow?.year ?? startYear}`,    c:"#34d399" },
-            { l:"End Balance",     v:depleted ? "DEPLETED" : fmt(finalBal), s:depleted ? `Ran out ${depYear}` : `Nominal ${endYear}`, c:depleted?"#f87171":finalBal>=target?"#34d399":"#fbbf24" },
-            { l:"Total Withdrawn", v:fmt(totalDrawn),                 s:"Nominal SGD all phases",                c:"#fb923c" },
+            { l:"Ideal Capital",   v:fmt(idealCap),   s:`Required at ${startYear}`,  c:"#38bdf8" },
+            { l:"Peak Portfolio",  v:fmt(peakRow?.balance ?? 0), s:`Year ${peakRow?.year ?? startYear}`, c:G_GREEN },
+            { l:"End Balance",     v:depleted ? "DEPLETED" : fmt(finalBal), s:depleted ? `Ran out ${depYear}` : `Nominal ${endYear}`, c:depleted ? G_RED : finalBal >= target ? G_GREEN : G_AMBER },
+            { l:"Portfolio Drawn", v:fmt(totalDrawn), s:hasCpf ? `+${fmt(totalCpf,1)} from CPF` : "Nominal SGD · all phases", c:"#fb923c" },
           ].map(k => (
-            <div key={k.l} style={{ background:"#0c1a2e", border:"1px solid #1e293b", borderRadius:10, padding:"16px 18px" }}>
-              <div style={{ fontSize:8, color:"#3b82f6", letterSpacing:"0.12em", fontFamily:"monospace", marginBottom:6, textTransform:"uppercase" }}>{k.l}</div>
+            <div key={k.l} style={{ background:NAVY_CARD, border:`1px solid ${GOLD}22`, borderRadius:10, padding:"16px 18px" }}>
+              <div style={{ fontSize:10, color:`${GOLD}88`, letterSpacing:"0.12em", fontFamily:"monospace", marginBottom:6, textTransform:"uppercase" }}>{k.l}</div>
               <div className="kpi-val" style={{ fontSize:22, color:k.c }}>{k.v}</div>
-              <div style={{ fontSize:10, color:"#3b82f6", marginTop:4 }}>{k.s}</div>
+              <div style={{ fontSize:10, color:DIM, marginTop:4 }}>{k.s}</div>
             </div>
           ))}
         </div>
 
-        {/* ─────────────────────────────────────────────────────────────────────── */}
-        {/* BALANCE CHART */}
-        {/* ─────────────────────────────────────────────────────────────────────── */}
-        <div className="card" style={{ background:"#0c1a2e", border:"1px solid #1e293b", marginBottom:18 }}>
-          <div className="section-tag">Portfolio Balance</div>
-          <div style={{ fontSize:17, fontWeight:600, color:"#3b82f6", marginBottom:20 }}>
-            Trajectory {startYear}–{endYear} · Starting {fmt(displayCap)}
+        {/* ── BALANCE CHART ── */}
+        <div className="card" style={{ background:NAVY_CARD, border:`1px solid ${GOLD}22`, marginBottom:18 }}>
+          <div className="section-tag">Portfolio Balance · Drawdown Trajectory</div>
+          <div style={{ fontSize:16, fontWeight:600, color:CREAM, marginBottom:4 }}>
+            {startYear}–{endYear} · Starting {fmt(displayCap)}
           </div>
-          <ResponsiveContainer width="100%" height={260}>
-            <AreaChart data={data} margin={{ top:4, right:8, bottom:0, left:0 }}>
+          {(hasCpf || hasLump) && (
+            <div style={{ fontSize:11, fontFamily:"monospace", color:DIM, marginBottom:16 }}>
+              {hasCpf && <span style={{ color:PLATINUM, marginRight:14 }}>CPF LIFE from {cpfStartYear}</span>}
+              {hasLump && <span style={{ color:"#a78bfa" }}>Lump sum in {lump55Year}</span>}
+            </div>
+          )}
+          <ResponsiveContainer width="100%" height={280}>
+            <ComposedChart data={data} margin={{ top:4, right:8, bottom:0, left:0 }}>
               <defs>
                 <linearGradient id="balGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#3b82f6" stopOpacity={0.4} />
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.03} />
+                  <stop offset="5%"  stopColor={GOLD} stopOpacity={0.3} />
+                  <stop offset="95%" stopColor={GOLD} stopOpacity={0.02} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#0a1828" />
-              <XAxis dataKey="year" tick={{ fill:"#3b82f6", fontSize:10, fontFamily:"monospace" }} />
-              <YAxis tickFormatter={v => fmt(v, 1)} tick={{ fill:"#3b82f6", fontSize:10, fontFamily:"monospace" }} width={80} />
+              <XAxis dataKey="year" tick={{ fill:GOLD, fontSize:10, fontFamily:"monospace" }} />
+              <YAxis tickFormatter={v => fmt(v, 1)} tick={{ fill:GOLD, fontSize:10, fontFamily:"monospace" }} width={80} />
               <Tooltip content={<ChartTip />} />
-              <ReferenceLine y={target} stroke="#34d399" strokeDasharray="5 3"
-                label={{ value:`${fmt(target, 1)} target`, fill:"#34d399", fontSize:9, position:"insideTopRight" }} />
+              <ReferenceLine y={target} stroke={G_GREEN} strokeDasharray="5 3"
+                label={{ value:`${fmt(target, 1)} target`, fill:G_GREEN, fontSize:10, position:"insideTopRight" }} />
+              {hasCpf && cpfStartYear >= startYear && cpfStartYear <= endYear && (
+                <ReferenceLine x={cpfStartYear} stroke={PLATINUM} strokeDasharray="4 2"
+                  label={{ value:"CPF starts", fill:PLATINUM, fontSize:10, position:"insideTopRight" }} />
+              )}
+              {hasLump && lump55Year >= startYear && lump55Year <= endYear && (
+                <ReferenceLine x={lump55Year} stroke="#a78bfa" strokeDasharray="4 2"
+                  label={{ value:"Lump sum", fill:"#a78bfa", fontSize:10, position:"insideBottomRight" }} />
+              )}
               <Area type="monotone" dataKey="balance" name="Portfolio Balance"
-                stroke="#3b82f6" fill="url(#balGrad)" strokeWidth={2} dot={false} />
-            </AreaChart>
+                stroke={GOLD} fill="url(#balGrad)" strokeWidth={2} dot={false} />
+              {hasCpf && (
+                <Line type="monotone" dataKey="cpfIncome" name="CPF LIFE Income"
+                  stroke={PLATINUM} strokeWidth={1.5} dot={false} strokeDasharray="4 2" />
+              )}
+            </ComposedChart>
           </ResponsiveContainer>
-          {/* phase bar */}
-          <div style={{ display:"flex", borderRadius:3, overflow:"hidden", height:6, marginTop:14 }}>
+          <div style={{ display:"flex", borderRadius:3, overflow:"hidden", height:5, marginTop:14 }}>
             {phases.map(p => {
               const total = endYear - startYear + 1;
-              const ph    = Math.max(0, Math.min(p.endYr, endYear) - Math.max(p.startYr, startYear) + 1);
-              return ph > 0 && (
-                <div key={p.id} title={p.name}
-                  style={{ flex: ph / total, background: p.color, opacity: 0.65 }} />
-              );
+              const ph = Math.max(0, Math.min(p.endYr, endYear) - Math.max(p.startYr, startYear) + 1);
+              return ph > 0 && <div key={p.id} title={p.name} style={{ flex:ph/total, background:p.color, opacity:0.6 }} />;
             })}
           </div>
           <div style={{ display:"flex", gap:14, marginTop:8, flexWrap:"wrap" }}>
             {phases.map(p => (
-              <div key={p.id} style={{ display:"flex", alignItems:"center", gap:5, fontSize:10, color:"#3b82f6", fontFamily:"monospace" }}>
+              <div key={p.id} style={{ display:"flex", alignItems:"center", gap:5, fontSize:10, color:DIM, fontFamily:"monospace" }}>
                 <div style={{ width:8, height:8, borderRadius:2, background:p.color }} /> {p.name}
               </div>
             ))}
+            {hasCpf && (
+              <div style={{ display:"flex", alignItems:"center", gap:5, fontSize:10, color:PLATINUM, fontFamily:"monospace" }}>
+                <div style={{ width:18, height:2, background:PLATINUM, borderRadius:1 }} /> CPF LIFE
+              </div>
+            )}
           </div>
         </div>
 
-        {/* ─────────────────────────────────────────────────────────────────────── */}
-        {/* DRAWDOWN CHART */}
-        {/* ─────────────────────────────────────────────────────────────────────── */}
-        <div className="card" style={{ background:"#0c1a2e", border:"1px solid #1e293b", marginBottom:18 }}>
-          <div className="section-tag">Annual Drawdowns (Nominal SGD)</div>
-          <div style={{ fontSize:17, fontWeight:600, color:"#3b82f6", marginBottom:20 }}>
-            What You Actually Withdraw Each Year
+        {/* ── DRAWDOWN BAR CHART ── */}
+        <div className="card" style={{ background:NAVY_CARD, border:`1px solid ${GOLD}22`, marginBottom:18 }}>
+          <div className="section-tag">Annual Drawdowns · Nominal SGD</div>
+          <div style={{ fontSize:16, fontWeight:600, color:CREAM, marginBottom: hasCpf ? 6 : 18 }}>
+            What You Actually Draw From Your Portfolio Each Year
           </div>
+          {hasCpf && <div style={{ fontSize:11, color:PLATINUM, fontFamily:"monospace", marginBottom:16 }}>
+            Bars show net portfolio draw after CPF LIFE offsets from {cpfStartYear}
+          </div>}
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={data} barSize={5} margin={{ top:4, right:8, bottom:0, left:0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#0a1828" />
-              <XAxis dataKey="year" tick={{ fill:"#3b82f6", fontSize:10, fontFamily:"monospace" }} />
-              <YAxis tickFormatter={v => fmt(v, 1)} tick={{ fill:"#3b82f6", fontSize:10, fontFamily:"monospace" }} width={80} />
+              <XAxis dataKey="year" tick={{ fill:GOLD, fontSize:10, fontFamily:"monospace" }} />
+              <YAxis tickFormatter={v => fmt(v, 1)} tick={{ fill:GOLD, fontSize:10, fontFamily:"monospace" }} width={80} />
               <Tooltip content={<ChartTip />} />
-              <Bar dataKey="withdrawal" name="Annual Withdrawal">
+              <Bar dataKey="netWithdrawal" name="Net Portfolio Draw">
                 {data.map((d, i) => <Cell key={i} fill={d.phColor} opacity={0.85} />)}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-          <div style={{ marginTop:10, fontSize:11, color:"#3b82f6", fontFamily:"monospace" }}>
-            Inflation at {inflation}%/yr means real value stays flat while nominal grows
+          <div style={{ marginTop:10, fontSize:10, color:DIM, fontFamily:"monospace" }}>
+            Inflation at {inflation}%/yr · real value stays flat while nominal grows
           </div>
         </div>
 
-        {/* ─────────────────────────────────────────────────────────────────────── */}
-        {/* MILESTONE TABLE */}
-        {/* ─────────────────────────────────────────────────────────────────────── */}
-        <div className="card" style={{ background:"#0c1a2e", border:"1px solid #1e293b", marginBottom:18 }}>
+        {/* ── MILESTONE TABLE ── */}
+        <div className="card" style={{ background:NAVY_CARD, border:`1px solid ${GOLD}22`, marginBottom:18 }}>
           <div className="section-tag">Milestone Snapshots</div>
-          <div style={{ fontSize:17, fontWeight:600, color:"#3b82f6", marginBottom:20 }}>
-            Selected Years · Every 4 Years
-          </div>
+          <div style={{ fontSize:16, fontWeight:600, color:CREAM, marginBottom:20 }}>Selected Years · Every 4 Years</div>
           <div style={{ overflowX:"auto" }}>
             <table style={{ width:"100%", borderCollapse:"collapse", fontSize:12 }}>
               <thead>
-                <tr style={{ borderBottom:"1px solid #0f2030" }}>
-                  {["Year","Phase","Age","Nominal Draw","Real (2026)","Portfolio Balance"].map(h => (
+                <tr style={{ borderBottom:`1px solid ${GOLD}22` }}>
+                  {["Year","Phase","Age","Gross Draw","CPF LIFE","Net Draw","Portfolio Balance"].map(h => (
                     <th key={h} style={{
-                      textAlign: ["Year","Phase","Age"].includes(h) ? "left" : "right",
-                      padding:"8px 12px", color:"#3b82f6",
-                      fontSize:9, letterSpacing:"0.1em", fontFamily:"monospace", textTransform:"uppercase"
+                      textAlign:["Year","Phase","Age"].includes(h)?"left":"right",
+                      padding:"8px 12px", color:`${GOLD}88`,
+                      fontSize:10, letterSpacing:"0.1em", fontFamily:"monospace", textTransform:"uppercase"
                     }}>{h}</th>
                   ))}
                 </tr>
@@ -610,33 +826,32 @@
                   const age = d.year - birthYear;
                   return (
                     <tr key={d.year} style={{
-                      borderBottom:"1px solid #080f1e",
-                      background: d.year === endYear ? "#0a1f3a33" : "transparent"
+                      borderBottom:`1px solid ${GOLD}0f`,
+                      background: d.isLump55 ? "#1a130444" : d.year === endYear ? "#0f130833" : "transparent"
                     }}>
-                      <td style={{ padding:"10px 12px", fontFamily:"monospace", color:"#475569" }}>{d.year}</td>
+                      <td style={{ padding:"10px 12px", fontFamily:"monospace", color:DIM }}>
+                        {d.year}
+                        {d.isLump55 && <span style={{ color:"#a78bfa", fontSize:10, marginLeft:4 }}>+lump</span>}
+                        {d.isCpfStart && <span style={{ color:PLATINUM, fontSize:10, marginLeft:4 }}>CPF↓</span>}
+                      </td>
                       <td style={{ padding:"10px 12px" }}>
                         <span style={{ color:d.phColor, fontSize:11, fontWeight:600 }}>{d.phase || "—"}</span>
                       </td>
-                      <td style={{ padding:"10px 12px", fontFamily:"monospace", color:"#3b82f6", fontSize:11 }}>
-                        {age}
+                      <td style={{ padding:"10px 12px", fontFamily:"monospace", color:GOLD, fontSize:11 }}>{age}</td>
+                      <td style={{ textAlign:"right", padding:"10px 12px", fontFamily:"monospace", color:DIM }}>{fmt(d.withdrawal)}</td>
+                      <td style={{ textAlign:"right", padding:"10px 12px", fontFamily:"monospace",
+                        color: d.cpfIncome > 0 ? PLATINUM : `${GOLD}22` }}>
+                        {d.cpfIncome > 0 ? `−${fmt(d.cpfIncome)}` : "—"}
                       </td>
-                      <td style={{ textAlign:"right", padding:"10px 12px", fontFamily:"monospace", color:"#94a3b8" }}>
-                        {fmt(d.withdrawal)}
-                      </td>
-                      <td style={{ textAlign:"right", padding:"10px 12px", fontFamily:"monospace", color:"#3b82f6" }}>
-                        {ph ? `$${(ph.real / 1000).toFixed(0)}k` : "—"}
-                      </td>
+                      <td style={{ textAlign:"right", padding:"10px 12px", fontFamily:"monospace", color:TAUPE }}>{fmt(d.netWithdrawal)}</td>
                       <td style={{ textAlign:"right", padding:"10px 12px" }}>
                         <span className="kpi-val" style={{
                           fontSize:14,
-                          color: d.balance < 2_000_000 ? "#f87171"
-                               : d.balance < 5_000_000 ? "#fbbf24"
-                               : d.balance > 10_000_000 ? "#34d399"
-                               : "#60a5fa"
-                        }}>
-                          {fmt(d.balance)}
-                        </span>
-                        {d.year === endYear && <span style={{ fontSize:9, color:"#3b82f6", marginLeft:6 }}>final</span>}
+                          color: d.balance < 2_000_000 ? G_RED
+                               : d.balance < 5_000_000 ? G_AMBER
+                               : d.balance > 10_000_000 ? G_GREEN : "#38bdf8"
+                        }}>{fmt(d.balance)}</span>
+                        {d.year === endYear && <span style={{ fontSize:10, color:`${GOLD}66`, marginLeft:6 }}>final</span>}
                       </td>
                     </tr>
                   );
@@ -647,8 +862,8 @@
         </div>
 
         {/* FOOTER */}
-        <div style={{ fontSize:11, color:"#0f2030", fontFamily:"monospace", lineHeight:1.9, textAlign:"center", paddingTop:8 }}>
-          the betahuman · APRIL 2026 · FOR ILLUSTRATIVE PURPOSES ONLY · NOT FINANCIAL ADVICE
+        <div style={{ fontSize:10, color:`${GOLD}33`, fontFamily:"monospace", lineHeight:1.9, textAlign:"center", paddingTop:8, letterSpacing:"0.1em" }}>
+          THE BETAHUMAN · APRIL 2026 · FOR ILLUSTRATIVE PURPOSES ONLY · NOT FINANCIAL ADVICE
         </div>
       </div>
     );
