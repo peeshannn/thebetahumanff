@@ -111,12 +111,12 @@
   const PHASE_COLORS = ["#38bdf8","#fbbf24","#34d399","#a78bfa","#fb923c","#f87171","#e879f9","#22d3ee","#4ade80","#f472b6"];
 
   const DEFAULT_PHASES = [
-    { id:1, name:"Early Family",    startYr:2029, endYr:2038, real:300000, color:"#38bdf8" },
-    { id:2, name:"Education Spike", startYr:2039, endYr:2046, real:320000, color:"#fbbf24" },
-    { id:3, name:"Late Family",     startYr:2047, endYr:2048, real:260000, color:"#34d399" },
-    { id:4, name:"Freedom Couple",  startYr:2049, endYr:2058, real:200000, color:"#a78bfa" },
-    { id:5, name:"Early Health",    startYr:2059, endYr:2068, real:240000, color:"#fb923c" },
-    { id:6, name:"Late Health",     startYr:2069, endYr:2085, real:300000, color:"#f87171" },
+    { id:1, name:"Early Family",    startYr:2035, endYr:2044, real:150000, color:"#38bdf8" },
+    { id:2, name:"Education Spike", startYr:2045, endYr:2052, real:200000, color:"#fbbf24" },
+    { id:3, name:"Late Family",     startYr:2053, endYr:2055, real:150000, color:"#34d399" },
+    { id:4, name:"Freedom Couple",  startYr:2056, endYr:2064, real:120000, color:"#a78bfa" },
+    { id:5, name:"Early Health",    startYr:2065, endYr:2072, real:120000, color:"#fb923c" },
+    { id:6, name:"Late Health",     startYr:2073, endYr:2080, real:200000, color:"#f87171" },
   ];
 
   // ── DRAWDOWN MATH ────────────────────────────────────────────────────────────
@@ -255,10 +255,10 @@
     // model settings
     const [growth, setGrowth]       = useState(6.0);
     const [inflation, setInflation] = useState(2.7);
-    const [startYear, setStartYear] = useState(2029);
-    const [endYear, setEndYear]     = useState(2085);
-    const [birthYear, setBirthYear] = useState(1986);
-    const [target, setTarget]       = useState(2_000_000);
+    const [startYear, setStartYear] = useState(2035);
+    const [endYear, setEndYear]     = useState(2080);
+    const [birthYear, setBirthYear] = useState(1980);
+    const [target, setTarget]       = useState(1_000_000);
     const [phases, setPhases]       = useState(DEFAULT_PHASES);
 
     // CPF
@@ -267,8 +267,8 @@
     const [lumpSum55, setLumpSum55]     = useState(0);
 
     // accumulation
-    const [accPortfolio, setAccPortfolio] = useState(3_900_000);
-    const [accMonthly, setAccMonthly]     = useState(18_000);
+    const [accPortfolio, setAccPortfolio] = useState(1_000_000);
+    const [accMonthly, setAccMonthly]     = useState(5_000);
     const [accGrowth, setAccGrowth]       = useState(6.0);
     const ACC_YEAR = 2026;
 
@@ -859,6 +859,112 @@
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* ── DOWNLOAD CSV ── */}
+        <div style={{ display:"flex", justifyContent:"center", marginBottom:28 }}>
+          <button
+            onClick={() => {
+              const esc = v => `"${String(v).replace(/"/g, '""')}"`;
+              const rows = [];
+
+              // ── SECTION 1: Settings snapshot ──
+              rows.push(["BETAHUMAN FINANCIAL FREEDOM PLANNER — SETTINGS SNAPSHOT"]);
+              rows.push(["Generated", new Date().toLocaleDateString("en-SG", { day:"2-digit", month:"short", year:"numeric" })]);
+              rows.push([]);
+              rows.push(["PARAMETER", "VALUE"]);
+              rows.push(["Birth Year", birthYear]);
+              rows.push(["Retirement Start Year", startYear]);
+              rows.push(["Plan End Year", endYear]);
+              rows.push(["Age at Retirement", startYear - birthYear]);
+              rows.push(["Growth Rate (% p.a.)", `${growth}%`]);
+              rows.push(["Inflation Rate (% p.a.)", `${inflation}%`]);
+              rows.push(["Real Net Return (% p.a.)", `${(growth - inflation).toFixed(1)}%`]);
+              rows.push(["End Balance Target", `$${target.toLocaleString()}`]);
+              rows.push(["Ideal Starting Capital", `$${idealCap.toLocaleString()}`]);
+              rows.push([]);
+              rows.push(["CPF INTEGRATION"]);
+              rows.push(["CPF LIFE Monthly Payout (combined)", cpfMonthly > 0 ? `$${cpfMonthly.toLocaleString()}` : "Not set"]);
+              rows.push(["CPF LIFE Start Age", cpfStartAge]);
+              rows.push(["CPF LIFE Start Year", birthYear + cpfStartAge]);
+              rows.push(["Lump Sum at 55 (above FRS)", lumpSum55 > 0 ? `$${lumpSum55.toLocaleString()}` : "Not set"]);
+              rows.push([]);
+              rows.push(["ACCUMULATION PHASE"]);
+              rows.push(["Current Portfolio (2026)", `$${accPortfolio.toLocaleString()}`]);
+              rows.push(["Monthly Contribution", `$${accMonthly.toLocaleString()}`]);
+              rows.push(["Accumulation Growth Rate", `${accGrowth}%`]);
+              rows.push(["Projected Year to Hit Magic Number", hitYear ?? "Not reached"]);
+              rows.push([]);
+
+              // ── SECTION 2: Drawdown phases ──
+              rows.push(["DRAWDOWN PHASES"]);
+              rows.push(["Phase", "From", "To", "Real Draw/yr (2026 SGD)", "Nominal Draw at Start", "Nominal Draw at End"]);
+              phases.forEach(p => {
+                const nomFirst = (p.real * Math.pow(1 + inf, p.startYr - 2026)).toFixed(0);
+                const nomLast  = (p.real * Math.pow(1 + inf, p.endYr  - 2026)).toFixed(0);
+                rows.push([p.name, p.startYr, p.endYr, `$${p.real.toLocaleString()}`, `$${Number(nomFirst).toLocaleString()}`, `$${Number(nomLast).toLocaleString()}`]);
+              });
+              rows.push([]);
+
+              // ── SECTION 3: Accumulation year-by-year ──
+              rows.push(["ACCUMULATION · YEAR BY YEAR (2026 → RETIREMENT)"]);
+              rows.push(["Year", "Age", "Portfolio Value", "Magic Number Target", "Gap to Target"]);
+              accRows.forEach(r => {
+                const age = r.year - birthYear;
+                const gap = idealCap - r.portfolio;
+                rows.push([r.year, age, `$${r.portfolio.toLocaleString()}`, `$${idealCap.toLocaleString()}`, gap > 0 ? `-$${gap.toLocaleString()}` : `+$${Math.abs(gap).toLocaleString()}`]);
+              });
+              rows.push([]);
+
+              // ── SECTION 4: Drawdown year-by-year ──
+              rows.push(["DRAWDOWN · YEAR BY YEAR (RETIREMENT → END)"]);
+              rows.push(["Year", "Age", "Phase", "Gross Drawdown", "CPF LIFE Income", "Net Portfolio Draw", "Portfolio Balance", "Running Total Drawn"]);
+              let runningTotal = 0;
+              data.forEach(d => {
+                runningTotal += d.netWithdrawal;
+                const age = d.year - birthYear;
+                rows.push([
+                  d.year, age, d.phase || "—",
+                  `$${d.withdrawal.toLocaleString()}`,
+                  d.cpfIncome > 0 ? `$${d.cpfIncome.toLocaleString()}` : "—",
+                  `$${d.netWithdrawal.toLocaleString()}`,
+                  d.depleted ? "DEPLETED" : `$${d.balance.toLocaleString()}`,
+                  `$${runningTotal.toLocaleString()}`
+                ]);
+              });
+              rows.push([]);
+              rows.push(["FOR ILLUSTRATIVE PURPOSES ONLY · NOT FINANCIAL ADVICE · THE BETAHUMAN"]);
+
+              // Build CSV string
+              const csv = rows.map(r => r.map(esc).join(",")).join("\n");
+              const blob = new Blob([csv], { type:"text/csv;charset=utf-8;" });
+              const url  = URL.createObjectURL(blob);
+              const a    = document.createElement("a");
+              a.href     = url;
+              a.download = `betahuman-plan-${new Date().toISOString().slice(0,10)}.csv`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+            }}
+            style={{
+              display:"flex", alignItems:"center", gap:10,
+              padding:"14px 32px", borderRadius:8,
+              border:`1px solid ${GOLD}`,
+              background:`linear-gradient(135deg, ${GOLD}18 0%, ${GOLD}08 100%)`,
+              color:GOLD, fontSize:13, fontFamily:"monospace",
+              letterSpacing:"0.12em", fontWeight:600,
+              boxShadow:`0 0 20px ${GOLD}18`,
+              transition:"all 0.2s"
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background=`linear-gradient(135deg, ${GOLD}30 0%, ${GOLD}18 100%)`; e.currentTarget.style.boxShadow=`0 0 30px ${GOLD}33`; }}
+            onMouseLeave={e => { e.currentTarget.style.background=`linear-gradient(135deg, ${GOLD}18 0%, ${GOLD}08 100%)`; e.currentTarget.style.boxShadow=`0 0 20px ${GOLD}18`; }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            DOWNLOAD MY PLAN · CSV
+          </button>
         </div>
 
         {/* FOOTER */}
